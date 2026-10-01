@@ -1,7 +1,17 @@
 @import "tailwindcss";
 
+/* Self-hosted Latin subset: the portal CSP must not depend on fonts.gstatic,
+   and the Korean fallbacks are dead weight now that the UI is English. */
+@font-face {
+  font-family: 'Jua';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jua-latin.woff2') format('woff2');
+}
+
 @theme {
-  --font-sans: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --font-sans: 'Jua', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 html,
