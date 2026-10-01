@@ -1,7 +1,7 @@
-/* 포털 광고 통합 어댑터 (Poki / CrazyGames / 모의광고 자동 전환)
- * - ?poki 또는 poki 도메인 → Poki SDK v2
- * - ?crazy 또는 crazygames 도메인 → CrazyGames SDK v3
- * - 그 외 → AdOverlay 모의 광고 (웹인디/로컬 테스트)
+/* Unified portal ad adapter (Poki / CrazyGames / automatic fallback to mock ads)
+ * - ?poki or a poki domain → Poki SDK v2
+ * - ?crazy or a crazygames domain → CrazyGames SDK v3
+ * - anything else → AdOverlay mock ads (webindy / local testing)
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -142,7 +142,7 @@ export const Ads = {
     notifyGameplayStop();
   },
 
-  /** 보상형 광고. 시청 완료 시 true */
+  /** Rewarded ad. Returns true once the view is completed */
   async rewardedBreak(): Promise<boolean> {
     if (provider === 'poki' && ready) {
       try {

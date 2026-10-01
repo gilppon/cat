@@ -32,7 +32,7 @@ function drawPaw(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: numbe
 }
 
 /* =========================================================
- * BootScene - 모든 텍스처를 캔버스로 직접 그려 생성 (외부 에셋 불필요)
+ * BootScene - every texture is drawn straight onto a canvas (no external assets)
  * ========================================================= */
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -41,7 +41,7 @@ export class BootScene extends Phaser.Scene {
 
   create() {
     this.add
-      .text(GAME_W / 2, GAME_H / 2, '🐾 쉼터 준비 중…', {
+      .text(GAME_W / 2, GAME_H / 2, '🐾 Getting the shelter ready…', {
         fontFamily: FONT_UI,
         fontSize: '44px',
         color: '#8a5a2b',
@@ -66,8 +66,9 @@ export class BootScene extends Phaser.Scene {
     };
 
     try {
-      // 구글 폰트의 한글은 unicode-range 로 쪼개져 있으므로, 캔버스에 그릴 글자를 직접 지정해 미리 받아 둔다
-      const sample = '사료 창고 장난감 상자 구급 상자 보너스! 고마워요! 여기를 탭! 쉼터 준비 중 NEW MAX Lv.0123456789+';
+      // Google Fonts split glyphs by unicode-range, so name the exact strings we draw
+      // on canvas to preload them.
+      const sample = 'Food Pantry Toy Box First Aid Box Bonus! Thanks! Tap here! Getting the shelter ready NEW MAX Lv.0123456789+';
       Promise.race([
         document.fonts.load('32px "Jua"', sample).then(() => document.fonts.ready),
         new Promise((resolve) => window.setTimeout(resolve, 2200)),

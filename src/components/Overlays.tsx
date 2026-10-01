@@ -8,7 +8,7 @@ import { sfx } from '../lib/sfx';
 import { BoltIcon, CoinIcon, HeartIcon, Modal, cx } from './ui';
 import { asset } from '../lib/assets';
 
-/* ---------------- 토스트 ---------------- */
+/* ---------------- Toasts ---------------- */
 const TONE: Record<ToastTone, string> = {
   info: 'bg-white/95 text-slate-700 ring-slate-200',
   success: 'bg-emerald-50/95 text-emerald-800 ring-emerald-200',
@@ -52,7 +52,7 @@ export function Toasts() {
   );
 }
 
-/* ---------------- 구역 복원 축하 ---------------- */
+/* ---------------- Area restore celebration ---------------- */
 const CONFETTI_COLORS = ['#FF6B9D', '#FFC93C', '#6ED6B3', '#8EC5FF', '#B99BFF', '#FF9A3C'];
 
 function Confetti() {
@@ -108,15 +108,15 @@ export function CelebrationModal() {
         <div className="relative aspect-[16/9] overflow-hidden">
           <img src={asset(area.image)} alt={area.name} decoding="async" loading="lazy" className="anim-restore h-full w-full object-cover" />
           <div className="absolute inset-x-0 top-3 flex justify-center">
-            <span className="anim-shine rounded-full bg-amber-400 px-4 py-1.5 text-sm text-white shadow-lg">✨ 복원 완료 ✨</span>
+            <span className="anim-shine rounded-full bg-amber-400 px-4 py-1.5 text-sm text-white shadow-lg">✨ Restored ✨</span>
           </div>
         </div>
         <div className="p-5 text-center">
-          <div className="text-2xl text-slate-800">🎉 {area.name} 복원!</div>
+          <div className="text-2xl text-slate-800">🎉 {area.name} restored!</div>
           <p className="mt-1 text-sm text-slate-500">
             {isFinal
-              ? '버려졌던 항구 쉼터가 모두의 따뜻한 집으로 다시 태어났어요!'
-              : '쉼터가 한층 더 따뜻하고 포근해졌어요.'}
+              ? 'The abandoned harbor shelter is a warm home for everyone again!'
+              : 'The shelter feels even warmer and cozier now.'}
           </p>
           {pet && (
             <div className="mt-4 flex items-center gap-3 rounded-2xl p-3 text-left" style={{ backgroundColor: pet.color }}>
@@ -128,8 +128,8 @@ export function CelebrationModal() {
                 className="anim-float h-16 w-16 rounded-2xl object-cover shadow ring-4 ring-white"
               />
               <div>
-                <div className="text-slate-800">새 친구가 쉼터에 왔어요!</div>
-                <div className="text-xs text-slate-600">이제 {pet.label} 친구들도 도움을 요청해요 🐾</div>
+                <div className="text-slate-800">A new friend moved in!</div>
+                <div className="text-xs text-slate-600">{pet.label}s are asking for help too 🐾</div>
               </div>
             </div>
           )}
@@ -139,13 +139,13 @@ export function CelebrationModal() {
                 {r}
               </li>
             ))}
-            <li className="rounded-xl bg-emerald-50 px-3 py-2">⚡ 에너지 가득 충전 보너스!</li>
+            <li className="rounded-xl bg-emerald-50 px-3 py-2">⚡ Bonus: energy filled to full!</li>
           </ul>
           <button
             onClick={() => gameStore.closeCelebration()}
             className="anim-pulse-cta mt-5 w-full rounded-full bg-linear-to-b from-amber-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"
           >
-            계속 돌보러 가기
+            Keep Caring
           </button>
         </div>
       </div>
@@ -153,15 +153,15 @@ export function CelebrationModal() {
   );
 }
 
-/* ---------------- 출석 보상 ---------------- */
+/* ---------------- Daily login reward ---------------- */
 export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { streakDay: number; coins: number; energy: number; onClaim: () => void; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center p-4">
       <div className="anim-fade-in absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" onClick={onClose} />
       <div className="anim-scale-in relative w-full max-w-sm rounded-[28px] bg-[#FFFBF4] p-5 text-center shadow-2xl">
         <div className="text-5xl">📅</div>
-        <h3 className="mt-1 text-xl text-slate-800">출석 {streakDay}일째!</h3>
-        <p className="mt-0.5 text-xs text-slate-500">매일 오면 보상이 커져요 · 7일 뒤엔 1일차부터 다시 시작</p>
+        <h3 className="mt-1 text-xl text-slate-800">Day {streakDay} streak!</h3>
+        <p className="mt-0.5 text-xs text-slate-500">Come back daily for bigger rewards · resets to day 1 after 7</p>
         <div className="mt-3 grid grid-cols-7 gap-1">
           {DAILY_REWARDS.map((r, i) => (
             <div
@@ -175,7 +175,7 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
                     : 'bg-white text-slate-400 ring-black/5',
               )}
             >
-              <div className="text-[10px] font-bold">{i + 1}일</div>
+              <div className="text-[10px] font-bold">{i + 1}d</div>
               <div className="text-[9px] tabular-nums">{r.coins}💰</div>
             </div>
           ))}
@@ -184,22 +184,22 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
           onClick={onClaim}
           className="anim-pulse-cta mt-4 w-full rounded-full bg-linear-to-b from-amber-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"
         >
-          💰{coins} + ⚡{energy} 받기
+          💰{coins} + ⚡{energy} Claim
         </button>
         <button onClick={onClose} className="mt-2 w-full py-1 text-xs text-slate-400">
-          나중에 받기
+          Maybe later
         </button>
       </div>
     </div>
   );
 }
 
-/* ---------------- 도움말 & 도감 ---------------- */
+/* ---------------- Help & collection ---------------- */
 const STEPS = [
-  { icon: '🧺', title: '생성기를 탭해요', text: '사료 창고 · 장난감 상자 · 구급 상자를 탭하면 ⚡1 에너지로 아이템이 나와요.' },
-  { icon: '🧩', title: '같은 아이템을 합쳐요', text: '똑같은 아이템 두 개를 드래그해서 겹치면 한 단계 높은 아이템이 돼요. (최대 Lv.7)' },
-  { icon: '🐾', title: '친구들의 부탁을 들어줘요', text: '요청 카드와 같은 아이템이 보드에 생기면 “전달하기”! 코인과 하트를 받아요.' },
-  { icon: '🏡', title: '쉼터를 복원해요', text: '하트와 코인으로 구역을 복원하면 새로운 동물 친구들이 찾아오고 생성기도 좋아져요.' },
+  { icon: '🧺', title: 'Tap the generators', text: 'Tap the Food Pantry, Toy Box or First Aid Box to spawn an item for ⚡1 energy.' },
+  { icon: '🧩', title: 'Merge matching items', text: 'Drag two identical items together to upgrade one step. (Max Lv.7)' },
+  { icon: '🐾', title: 'Help your friends', text: 'When a request card matches an item on your board, hit "Deliver" for coins and hearts.' },
+  { icon: '🏡', title: 'Restore the shelter', text: 'Spend hearts and coins to restore areas, welcome new animal friends and upgrade generators.' },
 ];
 
 export function HelpModal({ onClose }: { onClose: () => void }) {
@@ -208,7 +208,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
   const total = Object.keys(ITEM_DATABASE).length;
 
   return (
-    <Modal title="📖 게임 방법 & 도감" onClose={onClose} wide>
+    <Modal title="📖 How to Play & Collection" onClose={onClose} wide>
       <div className="grid gap-2 sm:grid-cols-2">
         {STEPS.map((s, i) => (
           <div key={s.title} className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5">
@@ -224,12 +224,12 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
         ))}
       </div>
       <div className="mt-3 rounded-2xl bg-sky-50 p-3 text-xs leading-relaxed text-sky-800 ring-1 ring-sky-100">
-        💡 아이템을 탭하면 정보를 보고 판매할 수 있어요 · ✅ 배지가 붙은 아이템은 바로 전달할 수 있어요 · 요청 카드의
-        아이콘을 누르면 보드에서 찾아줘요 · 에너지는 15초마다 1씩 회복돼요
+        💡 Tap an item to see details and sell it · ✅ Badged items can be delivered right away · Tap an icon on a
+        request card to find it on the board · Energy refills by 1 every 15 seconds
       </div>
 
       <h4 className="mb-2 mt-5 text-base text-slate-800">
-        📚 아이템 도감{' '}
+        📚 Item Collection{' '}
         <span className="text-xs text-slate-400">
           ({d.discoveredItems.length}/{total})
         </span>
@@ -253,10 +253,10 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
               )}
             >
               <div className="font-bold">
-                {claimed ? '✅' : '🏆'} {t.count}종
+                {claimed ? '✅' : '🏆'} {t.count} items
               </div>
               <div className="tabular-nums">
-                {claimed ? '수령 완료' : `💰${t.coins} ⚡${t.energy}`}
+                {claimed ? 'Claimed' : `💰${t.coins} ⚡${t.energy}`}
               </div>
             </button>
           );
@@ -297,13 +297,13 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
         onClick={onClose}
         className="mt-5 w-full rounded-full bg-linear-to-b from-orange-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"
       >
-        알겠어요! 🐾
+        Got it! 🐾
       </button>
     </Modal>
   );
 }
 
-/* ---------------- 설정 ---------------- */
+/* ---------------- Settings ---------------- */
 export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp: () => void }) {
   const snap = useGame();
   const d = snap.data;
@@ -318,19 +318,19 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
   };
 
   const stats = [
-    { label: '돌본 친구', value: `${d.stats.ordersCompleted}마리`, icon: '🐾' },
-    { label: '합치기', value: `${d.stats.mergesDone}회`, icon: '🧩' },
-    { label: '만든 아이템', value: `${d.stats.itemsSpawned}개`, icon: '📦' },
-    { label: '쉼터 복원도', value: `${Math.round(overallProgress(d) * 100)}%`, icon: '🏡' },
+    { label: 'Friends cared for', value: `${d.stats.ordersCompleted}`, icon: '🐾' },
+    { label: 'Merges', value: `${d.stats.mergesDone}`, icon: '🧩' },
+    { label: 'Items made', value: `${d.stats.itemsSpawned}`, icon: '📦' },
+    { label: 'Shelter progress', value: `${Math.round(overallProgress(d) * 100)}%`, icon: '🏡' },
   ];
 
   return (
-    <Modal title="⚙️ 설정" onClose={onClose}>
+    <Modal title="⚙️ Settings" onClose={onClose}>
       <button
         onClick={toggle}
         className="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5"
       >
-        <span className="text-sm text-slate-700">{muted ? '🔇' : '🔊'} 효과음</span>
+        <span className="text-sm text-slate-700">{muted ? '🔇' : '🔊'} Sound</span>
         <span className={cx('relative h-7 w-12 rounded-full transition', muted ? 'bg-slate-300' : 'bg-emerald-400')}>
           <span
             className={cx('absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all', muted ? 'left-1' : 'left-6')}
@@ -344,7 +344,7 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
         }}
         className="mt-2 flex w-full items-center justify-between rounded-2xl bg-white p-3 text-sm text-slate-700 shadow-sm ring-1 ring-black/5"
       >
-        📖 게임 방법 & 도감 <span className="text-slate-300">›</span>
+        📖 How to Play & Collection <span className="text-slate-300">›</span>
       </button>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -372,9 +372,9 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
           confirm ? 'bg-rose-500 text-white' : 'bg-rose-50 text-rose-600 ring-1 ring-rose-100',
         )}
       >
-        {confirm ? '정말 초기화할까요? 한 번 더 누르면 모든 진행이 사라져요' : '🗑️ 진행 초기화'}
+        {confirm ? 'Really reset? Tap again to erase all progress' : '🗑️ Reset Progress'}
       </button>
-      <p className="mt-3 text-center text-[11px] text-slate-400">진행 상황은 이 브라우저에 자동 저장돼요 (localStorage)</p>
+      <p className="mt-3 text-center text-[11px] text-slate-400">Progress auto-saves in this browser (localStorage)</p>
     </Modal>
   );
 }

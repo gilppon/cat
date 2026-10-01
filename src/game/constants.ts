@@ -1,6 +1,6 @@
 import { BOARD_COLS, BOARD_ROWS } from '../managers/MergeManager';
 
-/* Phaser 캔버스 논리 해상도 & 레이아웃 (Scale.FIT 으로 화면에 맞춰짐) */
+/* Phaser canvas logical resolution & layout (fits the screen via Scale.FIT) */
 export const GAME_W = 900;
 export const GAME_H = 1140;
 

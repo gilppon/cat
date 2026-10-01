@@ -37,19 +37,19 @@ function BottomNav({ shelterOpen, badge, onBoard, onShelter, onShop, onHelp }: N
     >
       <div className="mx-auto grid max-w-md grid-cols-4 gap-1 rounded-[22px] bg-white/95 p-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] ring-1 ring-black/5 backdrop-blur">
         <button className={btn(!shelterOpen)} onClick={onBoard}>
-          <span className="text-xl leading-none">🧩</span>머지 보드
+          <span className="text-xl leading-none">🧩</span>Merge
         </button>
         <button className={btn(shelterOpen)} onClick={onShelter}>
-          <span className="text-xl leading-none">🏡</span>쉼터 복원
+          <span className="text-xl leading-none">🏡</span>Shelter
           {badge && (
             <span className="anim-badge absolute right-3 top-1 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
           )}
         </button>
         <button className={btn(false)} onClick={onShop}>
-          <span className="text-xl leading-none">⚡</span>상점
+          <span className="text-xl leading-none">⚡</span>Shop
         </button>
         <button className={btn(false)} onClick={onHelp}>
-          <span className="text-xl leading-none">📖</span>도움말
+          <span className="text-xl leading-none">📖</span>Help
         </button>
       </div>
     </nav>
@@ -68,14 +68,14 @@ export default function App() {
   const daily = gameStore.dailyStatus();
   const showDaily = started && !dailyDismissed && daily.available;
 
-  // 광고 SDK 초기화 + 모의광고 UI 등록
+  // Ad SDK init + mock-ad UI registration
   useEffect(() => {
     registerAdUI((kind, done) => setAd({ kind, done }));
     void Ads.init();
     return () => registerAdUI(null);
   }, []);
 
-  // 포털-compliant focus handling: Phaser already freezes the scene on blur,
+  // Portal-compliant focus handling: Phaser already freezes the scene on blur,
   // but the portal must also stop counting gameplay time in the background.
   useEffect(() => {
     if (!started) return;
@@ -100,7 +100,8 @@ export default function App() {
     };
   }, [started]);
 
-  // 에너지 자동 회복 (TopBar의 useNow 1s 타이머와 분리 유지: tick은 저장소 갱신용, useNow는 표시용)
+  // Automatic energy regen (kept separate from TopBar's useNow 1s timer: tick updates the
+  // store, useNow only drives the display)
   useEffect(() => {
     const id = window.setInterval(() => gameStore.tick(), 1000);
     return () => window.clearInterval(id);
@@ -110,7 +111,7 @@ export default function App() {
     sfx.unlock();
     setStarted(true);
     Ads.gameplayStart();
-    // 첫 플레이는 인터랙티브 튜토리얼이 안내하므로 HelpModal 자동오픈 생략
+    // The first playthrough is guided by the interactive tutorial, so skip auto-opening HelpModal
     if (gameStore.live.tutorialSeen) return;
     setHelpOpen(false);
   };
@@ -133,12 +134,12 @@ export default function App() {
       />
 
       <div className="flex min-h-0 flex-1 gap-3 px-2 pb-2 sm:px-3 lg:pb-3">
-        {/* 데스크톱: 주문 목록 */}
+        {/* Desktop: order list */}
         <aside className="hidden w-[272px] shrink-0 flex-col lg:flex">
           <OrdersPanel layout="column" />
         </aside>
 
-        {/* 보드 영역 */}
+        {/* Board area */}
         <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col items-center gap-2 overflow-y-auto pb-[78px] lg:overflow-visible lg:pb-0">
           <div className="w-full shrink-0 lg:hidden">
             <OrdersPanel layout="row" />
@@ -149,7 +150,7 @@ export default function App() {
           <ItemInfoBar />
         </main>
 
-        {/* 와이드 데스크톱: 쉼터 복원 패널 */}
+        {/* Wide desktop: shelter restore panel */}
         <aside className="hidden w-[400px] shrink-0 overflow-hidden rounded-[28px] shadow-xl ring-1 ring-black/5 xl:flex">
           <ShelterPanel />
         </aside>

@@ -23,7 +23,7 @@ function NeedTile({ item, meta, size, order }: { item: ItemConfig; meta: Categor
   return (
     <button
       onClick={() => gameStore.hint(order.requiredCategory, order.requiredLevel)}
-      title="보드에서 찾기"
+      title="Find on board"
       className={cx(
         'relative grid shrink-0 place-items-center rounded-xl text-2xl shadow-sm ring-2 ring-white transition active:scale-90',
         size,
@@ -68,7 +68,7 @@ function DeliverButton({ ready, order }: { ready: boolean; order: PetOrder }) {
           : 'bg-slate-100 text-slate-400',
       )}
     >
-      {ready ? '전달하기' : '준비 중'}
+      {ready ? 'Deliver' : 'Not ready'}
     </button>
   );
 }
@@ -85,8 +85,8 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
   const refresh = (
     <button
       onClick={() => gameStore.refreshOrder(order.id)}
-      title={`다른 친구 부르기 (코인 ${REFRESH_ORDER_COST})`}
-      aria-label={`다른 친구 부르기 (코인 ${REFRESH_ORDER_COST})`}
+      title={`Call another friend (${REFRESH_ORDER_COST} coins)`}
+      aria-label={`Call another friend (${REFRESH_ORDER_COST} coins)`}
       className={cx(
         'absolute grid place-items-center rounded-full bg-white text-slate-400 shadow ring-1 ring-black/5 transition hover:text-slate-700 active:scale-90',
         column ? 'right-2 top-2 h-7 w-7 text-xs' : '-left-1.5 -top-1.5 h-5 w-5 text-[10px]',
@@ -115,12 +115,12 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
       >
         {order.golden && (
           <span className="absolute -top-2 left-2 z-10 rounded-full bg-amber-400 px-1.5 py-px text-[10px] text-amber-950 shadow">
-            👑 황금 주문
+👑 Golden
           </span>
         )}
         {ready && (
           <span className="absolute -top-2 right-2 z-10 rounded-full bg-emerald-500 px-1.5 py-px text-[10px] text-white shadow">
-            준비 완료
+            Ready
           </span>
         )}
         <div className="flex items-center gap-2">
@@ -150,12 +150,12 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
     >
       {order.golden && (
         <span className="absolute -top-2 right-10 z-10 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] text-amber-950 shadow">
-          👑 황금 주문 · 보상 1.5배
+          👑 Golden · 1.5x reward
         </span>
       )}
       {ready && (
         <span className="absolute -top-2 left-3 z-10 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] text-white shadow">
-          준비 완료!
+          Ready!
         </span>
       )}
       {refresh}
@@ -177,7 +177,11 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
           <div className="truncate text-sm text-slate-700">{item.name}</div>
           <div className="mt-1">{bar}</div>
           <div className="mt-1 text-[10px] text-slate-400">
-            {ready ? '보드에 있어요! 바로 전달할 수 있어요' : best > 0 ? `보드 최고 Lv.${best} / 필요 Lv.${item.level}` : '아직 보드에 없어요'}
+            {ready
+              ? 'On your board! Ready to deliver'
+              : best > 0
+                ? `Board best Lv.${best} / need Lv.${item.level}`
+                : 'Not on the board yet'}
           </div>
         </div>
       </div>
@@ -197,8 +201,8 @@ export default function OrdersPanel({ layout }: { layout: 'row' | 'column' }) {
   return (
     <section className={cx('w-full', column && 'flex min-h-0 flex-1 flex-col')}>
       <div className="mb-1.5 flex items-center justify-between px-1">
-        <h2 className={cx('text-slate-700', column ? 'text-base' : 'text-[13px]')}>🐾 도움이 필요한 친구들</h2>
-        <span className="text-[11px] text-slate-500">돌본 친구 {d.stats.ordersCompleted}마리</span>
+        <h2 className={cx('text-slate-700', column ? 'text-base' : 'text-[13px]')}>🐾 Friends Needing Help</h2>
+        <span className="text-[11px] text-slate-500">{d.stats.ordersCompleted} cared for</span>
       </div>
       <div
         className={cx(

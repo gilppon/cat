@@ -40,7 +40,7 @@ function TaskRow({ task, data }: { task: RestoreTask; data: PlayerData }) {
         )}
       </div>
       {done ? (
-        <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700">✓ 완료</span>
+        <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700">✓ Done</span>
       ) : (
         <button
           onClick={() => gameStore.completeTask(task.id)}
@@ -51,7 +51,7 @@ function TaskRow({ task, data }: { task: RestoreTask; data: PlayerData }) {
               : 'bg-slate-200 text-slate-400',
           )}
         >
-          복원
+          Restore
         </button>
       )}
     </div>
@@ -107,7 +107,7 @@ function AreaCard({ area, index, data, active }: { area: ShelterArea; index: num
               {area.emoji} {area.name}
             </div>
             <div className="text-xs text-white/85">
-              {complete ? '✨ 복원 완료' : unlocked ? `복원 진행 ${done}/${total}` : '🔒 잠긴 구역'}
+              {complete ? '✨ Restored' : unlocked ? `${done}/${total} restored` : '🔒 Locked'}
             </div>
           </div>
           <span className="shrink-0 rounded-full bg-white/90 px-2 py-0.5 text-xs tabular-nums text-slate-700">
@@ -117,13 +117,13 @@ function AreaCard({ area, index, data, active }: { area: ShelterArea; index: num
         {!unlocked && (
           <div className="absolute inset-0 grid place-items-center">
             <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs text-slate-600 shadow">
-              🔒 이전 구역을 복원하면 열려요
+              🔒 Restore the previous area to unlock
             </span>
           </div>
         )}
         {complete && (
           <span className="anim-shine absolute right-2 top-2 rounded-full bg-amber-400 px-2.5 py-1 text-xs text-white shadow">
-            복원 완료 ✨
+            Restored ✨
           </span>
         )}
       </button>
@@ -140,7 +140,7 @@ function AreaCard({ area, index, data, active }: { area: ShelterArea; index: num
             <TaskRow key={t.id} task={t} data={data} />
           ))}
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-2.5 text-xs leading-relaxed text-amber-800">
-            <div className="mb-0.5 text-amber-600">🎁 구역 복원 보상</div>
+            <div className="mb-0.5 text-amber-600">🎁 Area rewards</div>
             {area.rewardText.join(' · ')}
           </div>
         </div>
@@ -161,14 +161,14 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
         <div className="flex items-center justify-between gap-2">
           <div>
             <div className="text-[11px] text-sky-700/80">Home Restore</div>
-            <h2 className="text-xl text-slate-800">🏡 쉼터 복원</h2>
+            <h2 className="text-xl text-slate-800">🏡 Restore Shelter</h2>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">쉼터 Lv.{d.shelterLevel}</span>
+            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">Shelter Lv.{d.shelterLevel}</span>
             {onClose && (
               <button
                 onClick={onClose}
-                aria-label="닫기"
+                aria-label="Close"
                 className="grid h-9 w-9 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-black/5 transition active:scale-90"
               >
                 ✕
@@ -179,7 +179,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
 
         <div className="mt-3">
           <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
-            <span>전체 복원도</span>
+            <span>Overall progress</span>
             <span className="tabular-nums text-slate-700">{Math.round(overall * 100)}%</span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-amber-100">
@@ -197,7 +197,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
               if (!sp) return null;
               const unlocked = d.unlockedPets.includes(id);
               return (
-                <div key={id} className="flex flex-col items-center gap-0.5" title={unlocked ? sp.label : `${sp.label} (잠김)`}>
+                <div key={id} className="flex flex-col items-center gap-0.5" title={unlocked ? sp.label : `${sp.label} (locked)`}>
                   <div
                     className={cx(
                       'relative h-10 w-10 overflow-hidden rounded-2xl shadow ring-2 ring-white',
@@ -222,7 +222,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
             </span>
             <span className="flex items-center gap-1 rounded-full bg-white px-2 py-0.5 shadow-sm ring-1 ring-black/5">
               <CoinIcon className="h-4 w-4" />
-              {d.coins.toLocaleString('ko-KR')}
+              {d.coins.toLocaleString('en-US')}
             </span>
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
       <div className="soft-scroll flex-1 space-y-3 overflow-y-auto p-3 pb-28 lg:pb-4">
         {activeIndex === -1 && (
           <div className="rounded-3xl bg-linear-to-r from-amber-100 to-rose-100 p-4 text-center text-sm text-slate-700 shadow-sm">
-            🏆 쉼터가 완전히 복원됐어요! 계속해서 친구들을 돌봐 주세요.
+            🏆 The shelter is fully restored! Keep caring for your friends.
           </div>
         )}
         {SHELTER_AREAS.map((area, i) => (

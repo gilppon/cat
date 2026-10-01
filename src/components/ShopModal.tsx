@@ -38,12 +38,12 @@ function ShopContent({ data }: { data: PlayerData }) {
   };
 
   return (
-    <Modal title="⚡ 에너지 상점" onClose={() => gameStore.setShopOpen(false)}>
+    <Modal title="⚡ Energy Shop" onClose={() => gameStore.setShopOpen(false)}>
       <div className="mb-3 flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5">
         <div className="flex items-center gap-2">
           <BoltIcon className="h-8 w-8" />
           <div>
-            <div className="text-[11px] text-slate-400">현재 에너지</div>
+            <div className="text-[11px] text-slate-400">Current energy</div>
             <div className="text-lg tabular-nums text-slate-800">
               {data.energy} / {data.maxEnergy}
             </div>
@@ -51,7 +51,7 @@ function ShopContent({ data }: { data: PlayerData }) {
         </div>
         <div className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1.5 text-sm tabular-nums text-amber-800 ring-1 ring-amber-200">
           <CoinIcon className="h-4 w-4" />
-          {data.coins.toLocaleString('ko-KR')}
+          {data.coins.toLocaleString('en-US')}
         </div>
       </div>
 
@@ -88,8 +88,8 @@ function ShopContent({ data }: { data: PlayerData }) {
       <div className="mt-3 flex items-center gap-3 rounded-2xl bg-linear-to-r from-rose-50 to-amber-50 p-3 ring-1 ring-rose-100">
         <div className="text-3xl">🎁</div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm text-slate-800">쉼터 후원 선물</div>
-          <div className="text-[11px] text-slate-500">3분마다 ⚡5 + 코인 10을 받을 수 있어요</div>
+          <div className="text-sm text-slate-800">Shelter Sponsorship Gift</div>
+          <div className="text-[11px] text-slate-500">Get ⚡5 + 10 coins every 3 minutes</div>
         </div>
         <button
           disabled={!giftReady}
@@ -101,7 +101,7 @@ function ShopContent({ data }: { data: PlayerData }) {
               : 'bg-slate-100 tabular-nums text-slate-400',
           )}
         >
-          {giftReady ? '받기' : timer}
+          {giftReady ? 'Claim' : timer}
         </button>
       </div>
 
@@ -115,7 +115,7 @@ function ShopContent({ data }: { data: PlayerData }) {
             : 'anim-pulse-soft bg-linear-to-b from-violet-500 to-purple-600 text-white shadow active:scale-95',
         )}
       >
-        🎬 {adBusy ? '광고 로딩 중...' : '광고 보고 에너지 +15 충전'}
+        🎬 {adBusy ? 'Loading ad...' : 'Watch an ad for +15 energy'}
       </button>
       {giftReady && (
         <button
@@ -123,12 +123,12 @@ function ShopContent({ data }: { data: PlayerData }) {
           onClick={watchGiftAd}
           className="mt-2 w-full rounded-2xl bg-white px-3 py-2 text-xs text-slate-500 ring-1 ring-black/5 transition active:scale-95 disabled:opacity-50"
         >
-          🎬 광고 보고 후원 선물 2배로 받기
+          🎬 Watch an ad to double the sponsorship gift
         </button>
       )}
 
       <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-400">
-        에너지는 {ENERGY_REGEN_MS / 1000}초마다 1씩 자동으로 회복돼요 · 코인 구매 외에 광고 보상도 있어요
+        Energy refills by 1 every {ENERGY_REGEN_MS / 1000} seconds · Ad rewards work alongside coin purchases
       </p>
     </Modal>
   );

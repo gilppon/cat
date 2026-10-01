@@ -4,8 +4,8 @@ import { MainScene } from '../scenes/MainScene';
 import { GAME_H, GAME_W } from './constants';
 
 /* =========================================================
- * Phaser 3 게임 엔트리 (사양서 src/main.ts 역할)
- * React 의 <PhaserBoard /> 가 마운트될 때 생성된다.
+ * Phaser 3 game entry point
+ * Created when React mounts <PhaserBoard />.
  * ========================================================= */
 export function createGame(parent: HTMLElement): Phaser.Game {
   return new Phaser.Game({

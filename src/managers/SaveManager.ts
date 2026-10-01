@@ -4,9 +4,9 @@ import { OrderManager } from './OrderManager';
 import { ORDER_LINES, PET_SPECIES } from '../data/shelter';
 
 /* =========================================================
- * 데이터 저장 및 세이브 매니저 (사양서 §4)
- *  - 기본 데이터를 매번 새로 만들어 참조 공유 버그를 방지
- *  - 이전 버전(5x5 보드 등) 세이브도 안전하게 마이그레이션
+ * Data storage & save manager
+ *  - always rebuilds the default data so references are never shared
+ *  - older saves (e.g. a 5x5 board) migrate safely
  * ========================================================= */
 
 const SAVE_KEY = 'PETS_HARBOR_SAVE_V1';
@@ -28,7 +28,7 @@ export class SaveManager {
       const targetRow = board[row];
       if (item && targetRow && row < BOARD_ROWS && col < BOARD_COLS) targetRow[col] = item;
     };
-    // 튜토리얼용 시작 아이템
+    // Starter items for the tutorial
     place(5, 1, 'food_1');
     place(5, 2, 'food_1');
     place(4, 3, 'toy_1');
@@ -37,7 +37,7 @@ export class SaveManager {
 
     const starter = (n: number, petName: string, category: ItemCategory, level: number): PetOrder => {
       const reward = OrderManager.rewardFor(level, false);
-      const lines = ORDER_LINES[category] ?? ['잘 부탁해요!'];
+      const lines = ORDER_LINES[category] ?? ['Thanks for your help!'];
       return {
         id: `order_start_${n}`,
         petName,
@@ -47,7 +47,7 @@ export class SaveManager {
         rewardCoins: reward.coins,
         rewardHearts: reward.hearts,
         isHealthy: category !== 'medicine',
-        message: lines[n % lines.length] ?? '잘 부탁해요!',
+        message: lines[n % lines.length] ?? 'Thanks for your help!',
       };
     };
 
@@ -61,7 +61,7 @@ export class SaveManager {
       unlockedPets: ['stray_cat_01'],
       boardState: board,
       lastEnergyRegenTime: now,
-      orders: [starter(0, '나비', 'food', 2), starter(1, '치즈', 'toy', 2), starter(2, '까미', 'medicine', 3)],
+      orders: [starter(0, 'Nabi', 'food', 2), starter(1, 'Cheese', 'toy', 2), starter(2, 'Kkami', 'medicine', 3)],
       completedTasks: [],
       generatorLevels: { food: 1, toy: 1, medicine: 1 },
       discoveredItems: ['food_1', 'toy_1', 'medicine_1', 'medicine_2'],
@@ -116,7 +116,7 @@ export class SaveManager {
     }
   }
 
-  /** 저장 데이터 검증 + 누락 필드 보정 + 아이템 설정 재수화 */
+  /** Save validation + filling in missing fields + re-hydrating item configs */
   static normalize(p: Partial<PlayerData>): PlayerData {
     const d = SaveManager.createDefault();
 
@@ -147,7 +147,7 @@ export class SaveManager {
           .map((o) => ({
             ...o,
             message:
-              typeof o.message === 'string' ? o.message : (ORDER_LINES[o.requiredCategory]?.[0] ?? '잘 부탁해요!'),
+              typeof o.message === 'string' ? o.message : (ORDER_LINES[o.requiredCategory]?.[0] ?? 'Thanks for your help!'),
             isHealthy: o.requiredCategory !== 'medicine',
           }))
       : d.orders;

@@ -5,13 +5,13 @@ import { CATEGORY_META, MergeManager } from '../managers/MergeManager';
 import { CoinIcon, cx } from './ui';
 
 const TIPS = [
-  '같은 아이템 두 개를 드래그해서 겹치면 한 단계 높은 아이템이 돼요!',
-  '아래 생성기를 탭하면 ⚡1 에너지로 새 아이템이 나와요.',
-  '요청 카드의 아이템 아이콘을 누르면 보드에서 찾아줘요.',
-  '✅ 표시가 붙은 아이템은 친구에게 바로 전달할 수 있어요.',
-  '하트와 코인을 모아 쉼터를 복원하면 새 친구들이 찾아와요.',
-  '에너지는 15초마다 1씩 자동으로 회복돼요.',
-  '아이템을 탭하면 정보를 보고 판매할 수 있어요.',
+  'Drag two identical items together to upgrade one step!',
+  'Tap a generator below to spawn an item for ⚡1 energy.',
+  'Tap an item icon on a request card to find it on the board.',
+  'Items with a ✅ badge can be delivered to a friend right away.',
+  'Gather hearts and coins to restore the shelter and welcome new friends.',
+  'Energy refills by 1 automatically every 15 seconds.',
+  'Tap an item to see its details and sell it.',
 ];
 
 export default function ItemInfoBar() {
@@ -76,15 +76,15 @@ export default function ItemInfoBar() {
           <span className="shrink-0 rounded-full px-1.5 py-px text-[10px] text-white" style={{ backgroundColor: meta.dark }}>
             Lv.{item.level}
           </span>
-          {needed && <span className="shrink-0 text-[10px] text-emerald-600">✅ 주문 아이템</span>}
+          {needed && <span className="shrink-0 text-[10px] text-emerald-600">✅ Requested</span>}
         </div>
         <div className="truncate text-[11px] text-slate-500">
           {next ? (
             <>
-              하나 더 합치면 → {next.emoji} {next.name}
+              Merge one more → {next.emoji} {next.name}
             </>
           ) : (
-            '✨ 최고 단계 아이템이에요!'
+            '✨ Max level item!'
           )}
         </div>
       </div>
@@ -114,10 +114,10 @@ export default function ItemInfoBar() {
         )}
       >
         {confirm ? (
-          '정말 판매?'
+          'Sell?'
         ) : (
           <>
-            판매 <CoinIcon className="h-4 w-4" /> {price}
+            Sell <CoinIcon className="h-4 w-4" /> {price}
           </>
         )}
       </button>

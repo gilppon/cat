@@ -1,4 +1,4 @@
-/** 한글 받침 여부 판단 */
+/** Detects whether the last syllable of a word has a Hangul final consonant (batchim) */
 export function hasBatchim(word: string): boolean {
   if (!word) return false;
   const code = word.charCodeAt(word.length - 1);
@@ -6,10 +6,14 @@ export function hasBatchim(word: string): boolean {
   return (code - 0xac00) % 28 !== 0;
 }
 
-type JosaPair = '이/가' | '을/를' | '은/는' | '와/과';
+/** Particle slot a word would fill in Korean (subject / object / topic / partner). */
+type JosaPair = 'subject' | 'object' | 'topic' | 'partner';
 
-/** 받침에 맞는 조사를 붙여 준다. 예) withJosa('구름', '이/가') => '구름이' */
-export function withJosa(word: string, pair: JosaPair): string {
-  const [withFinal, withoutFinal] = pair.split('/');
-  return word + (hasBatchim(word) ? withFinal : withoutFinal);
+/**
+ * English copy needs no Korean particles, so this just returns the word.
+ * The slot argument is kept so call sites stay stable if Korean copy ever returns.
+ * e.g. withJosa('Cloud', 'subject') => 'Cloud'
+ */
+export function withJosa(word: string, _pair: JosaPair): string {
+  return word;
 }

@@ -6,24 +6,24 @@ import { SHELTER_AREAS } from '../data/shelter';
 afterEach(() => vi.restoreAllMocks());
 
 describe('OrderManager', () => {
-  it('레벨 범위는 shelterLevel에 따라 달라진다', () => {
+  it('level range follows shelterLevel', () => {
     expect(OrderManager.levelRange(1)).toEqual([2, 3]);
     expect(OrderManager.levelRange(6)).toEqual([4, 7]);
   });
 
-  it('주문 슬롯은 Lv3부터 4개', () => {
+  it('order slots go up to 4 at Lv3', () => {
     expect(OrderManager.maxOrders(1)).toBe(3);
     expect(OrderManager.maxOrders(3)).toBe(4);
   });
 
-  it('보상은 레벨이 오르면 코인이 증가한다', () => {
+  it('rewards pay more coins as the level rises', () => {
     const low = OrderManager.rewardFor(2, false);
     const high = OrderManager.rewardFor(5, false);
     expect(high.coins).toBeGreaterThan(low.coins);
     expect(high.hearts).toBeGreaterThanOrEqual(low.hearts);
   });
 
-  it('황금 주문은 쉼터 완복 이후에만 생성되고 보상을 1.5배 지급한다', () => {
+  it('golden orders only spawn after a full restore and pay 1.5x', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const data = SaveManager.createDefault();
 

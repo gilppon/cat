@@ -1,7 +1,7 @@
 import type { BoardCell, CellPos, ItemCategory, ItemConfig } from '../types/game';
 
 /* =========================================================
- * 코어 머지 로직 매니저 (사양서 §5)
+ * Core merge logic manager
  * ========================================================= */
 
 export const BOARD_ROWS = 6;
@@ -23,9 +23,9 @@ export interface CategoryMeta {
 
 export const CATEGORY_META: Record<ItemCategory, CategoryMeta> = {
   food: {
-    label: '사료·간식',
-    need: '배고파요',
-    generatorName: '사료 창고',
+    label: 'Food & Treats',
+    need: "I'm hungry",
+    generatorName: 'Food Pantry',
     generatorEmoji: '🧺',
     light: '#FFE7C2',
     mid: '#FFB463',
@@ -33,9 +33,9 @@ export const CATEGORY_META: Record<ItemCategory, CategoryMeta> = {
     soft: '#FFF4E3',
   },
   toy: {
-    label: '장난감',
-    need: '심심해요',
-    generatorName: '장난감 상자',
+    label: 'Toys',
+    need: "I'm bored",
+    generatorName: 'Toy Box',
     generatorEmoji: '🎁',
     light: '#EDE3FF',
     mid: '#B99BFF',
@@ -43,9 +43,9 @@ export const CATEGORY_META: Record<ItemCategory, CategoryMeta> = {
     soft: '#F4EFFF',
   },
   medicine: {
-    label: '의약품',
-    need: '아파요',
-    generatorName: '구급 상자',
+    label: 'Medicine',
+    need: 'I feel sick',
+    generatorName: 'First Aid Box',
     generatorEmoji: '🧰',
     light: '#D6F8EC',
     mid: '#6ED6B3',
@@ -56,31 +56,31 @@ export const CATEGORY_META: Record<ItemCategory, CategoryMeta> = {
 
 const CHAINS: Record<ItemCategory, Array<{ name: string; emoji: string }>> = {
   food: [
-    { name: '따뜻한 우유', emoji: '🥛' },
-    { name: '뼈다귀 간식', emoji: '🦴' },
-    { name: '싱싱한 생선', emoji: '🐟' },
-    { name: '닭고기 구이', emoji: '🍗' },
-    { name: '프리미엄 통조림', emoji: '🥫' },
-    { name: '수제 영양 도시락', emoji: '🍱' },
-    { name: '축하 펫 케이크', emoji: '🎂' },
+    { name: 'Warm Milk', emoji: '🥛' },
+    { name: 'Bone Treat', emoji: '🦴' },
+    { name: 'Fresh Fish', emoji: '🐟' },
+    { name: 'Roast Chicken', emoji: '🍗' },
+    { name: 'Premium Can', emoji: '🥫' },
+    { name: 'Homemade Bento', emoji: '🍱' },
+    { name: 'Celebration Cake', emoji: '🎂' },
   ],
   toy: [
-    { name: '털실 뭉치', emoji: '🧶' },
-    { name: '말랑 테니스공', emoji: '🎾' },
-    { name: '쥐돌이 인형', emoji: '🐭' },
-    { name: '날아라 원반', emoji: '🥏' },
-    { name: '포근한 곰 인형', emoji: '🧸' },
-    { name: '미니 회전목마', emoji: '🎠' },
-    { name: '꿈의 놀이 성', emoji: '🏰' },
+    { name: 'Yarn Ball', emoji: '🧶' },
+    { name: 'Soft Tennis Ball', emoji: '🎾' },
+    { name: 'Mouse Plush', emoji: '🐭' },
+    { name: 'Flying Disc', emoji: '🥏' },
+    { name: 'Cuddly Bear', emoji: '🧸' },
+    { name: 'Mini Carousel', emoji: '🎠' },
+    { name: 'Dream Playground', emoji: '🏰' },
   ],
   medicine: [
-    { name: '반창고', emoji: '🩹' },
-    { name: '비타민 알약', emoji: '💊' },
-    { name: '상처 연고', emoji: '🧴' },
-    { name: '예방 주사', emoji: '💉' },
-    { name: '체온계', emoji: '🌡️' },
-    { name: '특효 물약', emoji: '🧪' },
-    { name: '명의의 청진기', emoji: '🩺' },
+    { name: 'Bandage', emoji: '🩹' },
+    { name: 'Vitamin Pill', emoji: '💊' },
+    { name: 'Healing Ointment', emoji: '🧴' },
+    { name: 'Preventive Shot', emoji: '💉' },
+    { name: 'Thermometer', emoji: '🌡️' },
+    { name: 'Magic Potion', emoji: '🧪' },
+    { name: "Doctor's Stethoscope", emoji: '🩺' },
   ],
 };
 
@@ -137,7 +137,7 @@ export class MergeManager {
     return cells;
   }
 
-  /** 기준점(보드 밖일 수도 있음)에서 가장 가까운 빈 칸 */
+  /** Nearest empty cell to a reference point (which may be off the board) */
   static findNearestEmpty(board: Board, fromRow: number, fromCol: number): CellPos | null {
     let best: CellPos | null = null;
     let bestDist = Infinity;
@@ -171,7 +171,7 @@ export class MergeManager {
     return best;
   }
 
-  /** 주문 레벨까지 필요한 재료 대비 보드 위 재료 비율 (0~1) */
+  /** Progress toward the ingredients an order needs, measured against board stock (0~1) */
   static materialProgress(board: Board, category: ItemCategory, level: number): number {
     const target = 2 ** (level - 1);
     let sum = 0;
@@ -183,7 +183,7 @@ export class MergeManager {
     return Math.min(1, sum / target);
   }
 
-  /** 생성기 레벨에 따라 스폰될 아이템 레벨을 결정 */
+  /** Decides the item level a generator spawns, based on the generator level */
   static rollGeneratorLevel(genLevel: number): number {
     const lv = Math.max(1, Math.min(3, genLevel));
     const p3 = lv >= 3 ? 0.08 : 0;

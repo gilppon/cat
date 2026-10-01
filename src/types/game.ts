@@ -1,6 +1,6 @@
 /* =========================================================
- * 유기동물 쉼터 복원 머지 (Pets Harbor & Home Restore)
- * 게임 전역 타입 정의 (사양서 §3 + 확장 필드)
+ * Pet Shelter Restore Merge (Pets Harbor & Home Restore)
+ * Global game type definitions
  * ========================================================= */
 
 export type ItemCategory = 'food' | 'toy' | 'medicine';
@@ -13,7 +13,7 @@ export interface ItemConfig {
   name: string;
   textureKey: string;
   maxLevel: number;
-  /** 확장: 아이템 아이콘(이모지) - BootScene 에서 텍스처로 렌더링 */
+  /** Extra: item icon (emoji) - rendered as a texture in BootScene */
   emoji: string;
 }
 
@@ -37,9 +37,9 @@ export interface PetOrder {
   rewardCoins: number;
   rewardHearts: number;
   isHealthy: boolean;
-  /** 확장: 말풍선 대사 */
+  /** Extra: speech bubble line */
   message: string;
-  /** 확장: 엔드리스 황금 주문 (보상 1.5배) */
+  /** Extra: endless golden order (1.5x reward) */
   golden?: boolean;
 }
 
@@ -60,7 +60,7 @@ export interface PlayerData {
   unlockedPets: string[];
   boardState: (ItemConfig | null)[][];
   lastEnergyRegenTime: number;
-  // ---------- 확장 필드 ----------
+  // ---------- Extra fields ----------
   orders: PetOrder[];
   completedTasks: string[];
   generatorLevels: GeneratorLevels;
@@ -74,7 +74,7 @@ export interface PlayerData {
   claimedCollection: number[];
 }
 
-/** GameStore -> Phaser MainScene 으로 전달되는 보드 변화 이벤트 */
+/** Board change events passed from GameStore to the Phaser MainScene */
 export type BoardEvent =
   | { type: 'spawn'; category: ItemCategory; to: CellPos; item: ItemConfig }
   | { type: 'move'; from: CellPos; to: CellPos }

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
-/** @deprecated cn을 직접 사용 권장. 호환용 별칭. */
+/** @deprecated Import cn directly. Kept as a compatibility alias. */
 export const cx = cn;
 
 interface IconProps {
@@ -85,7 +85,7 @@ export function Modal({ title, onClose, children, wide }: ModalProps) {
           <h3 className="text-xl text-slate-800">{title}</h3>
           <button
             onClick={onClose}
-            aria-label="닫기"
+            aria-label="Close"
             className="grid h-9 w-9 place-items-center rounded-full bg-white text-slate-500 shadow ring-1 ring-black/5 transition hover:text-slate-800 active:scale-90"
           >
             ✕

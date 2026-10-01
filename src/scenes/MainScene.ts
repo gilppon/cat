@@ -23,7 +23,7 @@ import {
 } from '../game/constants';
 import { sfx } from '../lib/sfx';
 
-/** 보드 위 아이템 하나의 시각 표현 */
+/** Visual representation of a single item on the board */
 class ItemView {
   readonly container: Phaser.GameObjects.Container;
   readonly badge: Phaser.GameObjects.Image;
@@ -66,7 +66,7 @@ function emptyGrid(): (ItemView | null)[][] {
 }
 
 /* =========================================================
- * MainScene - 머지 보드 & 생성기 (드래그 앤 드롭, 합치기 연출)
+ * MainScene - merge board & generators (drag & drop, merge effects)
  * ========================================================= */
 export class MainScene extends Phaser.Scene {
   private views: (ItemView | null)[][] = [];
@@ -128,7 +128,7 @@ export class MainScene extends Phaser.Scene {
     this.unsubs = [];
   }
 
-  /* ---------------- 배경 ---------------- */
+  /* ---------------- Background ---------------- */
   private drawBoard() {
     const g = this.add.graphics().setDepth(0);
     const fx = BOARD_X - 22;
@@ -246,7 +246,7 @@ export class MainScene extends Phaser.Scene {
       .setDepth(90);
   }
 
-  /* ---------------- 입력 ---------------- */
+  /* ---------------- Input ---------------- */
   private cellAt(x: number, y: number): CellPos | null {
     const col = Math.floor((x - BOARD_X) / CELL);
     const row = Math.floor((y - BOARD_Y) / CELL);
@@ -367,7 +367,7 @@ export class MainScene extends Phaser.Scene {
     gameStore.spawnFromGenerator(g.category);
   }
 
-  /* ---------------- 보드 이벤트 연출 ---------------- */
+  /* ---------------- Board event effects ---------------- */
   private onBoardEvent(e: BoardEvent) {
     if (!this.alive) return;
     switch (e.type) {
@@ -537,7 +537,7 @@ export class MainScene extends Phaser.Scene {
         if (this.alive) this.starFx.explode(5, c.x, c.y);
       },
     });
-    if (item.level > 1) this.floatText(c.x, c.y - 52, '보너스!', '#FFE066', '#B86B00');
+    if (item.level > 1) this.floatText(c.x, c.y - 52, 'Bonus!', '#FFE066', '#B86B00');
     sfx.spawn();
   }
 
@@ -572,7 +572,7 @@ export class MainScene extends Phaser.Scene {
           });
         },
       });
-      this.floatText(c.x, c.y - 50, '고마워요!', '#FF5FA2', '#FFFFFF');
+      this.floatText(c.x, c.y - 50, 'Thank you!', '#FF5FA2', '#FFFFFF');
       sfx.deliver();
     } else {
       this.coinFx.explode(Math.min(12, 4 + value), c.x, c.y);
@@ -616,7 +616,7 @@ export class MainScene extends Phaser.Scene {
     }
   }
 
-  /** 저장소 상태와 스프라이트 격자가 어긋났을 때 조용히 보정 */
+  /** Quietly repairs the sprite grid when it drifts from store state */
   private syncBoard() {
     const board = gameStore.board;
     for (let r = 0; r < BOARD_ROWS; r++) {
@@ -641,7 +641,7 @@ export class MainScene extends Phaser.Scene {
     }
   }
 
-  /** 선택 표시, 주문 완료 가능 배지, 생성기 상태 갱신 */
+  /** Refreshes the selection ring, order-ready badges and generator state */
   private refreshOverlay() {
     if (!this.alive) return;
     this.syncBoard();
@@ -670,7 +670,7 @@ export class MainScene extends Phaser.Scene {
     });
   }
 
-  /* ---------------- 부가 연출 ---------------- */
+  /* ---------------- Extra effects ---------------- */
   private showHint(h: Hint) {
     if (!this.alive) return;
     let found = 0;
@@ -704,7 +704,7 @@ export class MainScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
         onComplete: () => g.container.setScale(1),
       });
-      this.floatText(g.x, g.y - GEN_H / 2 - 6, '여기를 탭!', '#FFFFFF', CATEGORY_META[h.category].dark);
+      this.floatText(g.x, g.y - GEN_H / 2 - 6, 'Tap here!', '#FFFFFF', CATEGORY_META[h.category].dark);
     }
   }
 

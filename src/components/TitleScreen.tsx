@@ -6,9 +6,9 @@ import { PET_ORDER, PET_SPECIES } from '../data/shelter';
 import { asset } from '../lib/assets';
 
 const FEATURES = [
-  { icon: '🧩', text: '같은 아이템을\n합쳐요' },
-  { icon: '🐾', text: '친구들의 부탁을\n들어줘요' },
-  { icon: '🏡', text: '버려진 쉼터를\n복원해요' },
+  { icon: '🧩', text: 'Merge matching\nitems' },
+  { icon: '🐾', text: 'Answer your\nfriends' },
+  { icon: '🏡', text: 'Restore an old\nshelter' },
 ];
 
 export default function TitleScreen({ onStart }: { onStart: () => void }) {
@@ -55,11 +55,11 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
           <div className="anim-float mx-auto mb-3 grid h-16 w-16 place-items-center rounded-[22px] bg-linear-to-br from-amber-300 to-orange-400 text-3xl shadow-lg ring-4 ring-white">
             🐾
           </div>
-          <p className="text-sm tracking-wide text-sky-700">유기동물 쉼터 복원 머지</p>
+          <p className="text-sm tracking-wide text-sky-700">Pet Shelter Restore Merge</p>
           <h1 className="mt-1 text-[40px] leading-[1.05] text-slate-800 sm:text-5xl">Pets Harbor</h1>
           <p className="text-xl text-orange-500 sm:text-2xl">&amp; Home Restore</p>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
-            버려진 항구 쉼터를 다시 일으키고, 상처받은 작은 친구들에게 따뜻한 집을 선물해 주세요.
+            Rebuild an abandoned harbor shelter and give hurt little friends a warm home.
           </p>
 
           <div className="mt-4 flex justify-center -space-x-2">
@@ -91,7 +91,7 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
             onClick={onStart}
             className="anim-pulse-cta mt-6 w-full rounded-full bg-linear-to-b from-orange-400 to-orange-500 py-3.5 text-xl text-white shadow-lg transition active:scale-[0.98]"
           >
-            {hasSave ? '▶ 이어서 하기' : '▶ 게임 시작'}
+            {hasSave ? '▶ Keep Playing' : '▶ Start Game'}
           </button>
           {hasSave && (
             <button
@@ -106,12 +106,12 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
               }}
               className="mt-3 text-xs text-slate-400 underline underline-offset-2 hover:text-slate-600"
             >
-              {confirmReset ? '정말 처음부터 시작할까요? (한 번 더 누르기)' : '처음부터 다시 시작'}
+              {confirmReset ? 'Really start over? (tap again)' : 'Start over from the beginning'}
             </button>
           )}
         </div>
         <p className="mt-4 text-center text-xs text-white/90 drop-shadow">
-          Phaser 3 · React · TypeScript · 모든 진행은 자동 저장돼요
+          Phaser 3 · React · TypeScript · Progress saves automatically
         </p>
       </div>
     </div>

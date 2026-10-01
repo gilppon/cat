@@ -1,4 +1,4 @@
-/* 오디오 파일 없이 WebAudio 로 합성하는 경쾌한 효과음 */
+/* Cheerful sound effects synthesised with WebAudio, no audio files needed */
 
 const MUTE_KEY = 'PETS_HARBOR_MUTED';
 let ctx: AudioContext | null = null;

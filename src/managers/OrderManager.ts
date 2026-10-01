@@ -17,7 +17,7 @@ function pick<T>(arr: readonly T[]): T {
 }
 
 /* =========================================================
- * 동물 친구들의 요청(주문) 생성기
+ * Request (order) generator for the animal friends
  * ========================================================= */
 export class OrderManager {
   static levelRange(shelterLevel: number): [number, number] {
@@ -53,7 +53,7 @@ export class OrderManager {
       level = min + Math.floor(Math.random() * (max - min + 1));
     }
 
-    // 새로 입소한 친구가 먼저 찾아오도록 가중치
+    // Weight picks so the newest resident tends to show up first
     const speciesIds = data.unlockedPets.filter((id) => PET_SPECIES[id]);
     const pool = speciesIds.length ? speciesIds : ['stray_cat_01'];
     const newest = PET_SPECIES[pool[pool.length - 1]!] ?? PET_SPECIES['stray_cat_01']!;
@@ -65,7 +65,7 @@ export class OrderManager {
     const reward = OrderManager.rewardFor(level);
     data.orderSeq += 1;
 
-    // 엔드리스: 쉼터 완복 후 25% 확률로 황금 주문 (보상 1.5배)
+    // Endless mode: after the shelter is fully restored, a 25% chance of a golden order (1.5x reward)
     const shelterDone = SHELTER_AREAS.every((a) => a.tasks.every((t) => data.completedTasks.includes(t.id)));
     const golden = shelterDone && Math.random() < 0.25;
 
