@@ -55,8 +55,8 @@ export class SaveManager {
     return {
       coins: 100,
       hearts: 20,
-      energy: 50,
-      maxEnergy: 50,
+      energy: 60,
+      maxEnergy: 60,
       shelterLevel: 1,
       unlockedPets: ['stray_cat_01'],
       boardState: board,
@@ -69,6 +69,9 @@ export class SaveManager {
       tutorialSeen: false,
       orderSeq: 10,
       lastGiftTime: 0,
+      lastDaily: 0,
+      dailyStreak: 0,
+      claimedCollection: [],
     };
   }
 
@@ -173,7 +176,7 @@ export class SaveManager {
         medicine: clamp(Math.round(num(rawGen.medicine, d.generatorLevels.medicine)), 1, 3),
       },
       discoveredItems: Array.isArray(p.discoveredItems)
-        ? p.discoveredItems.filter((id) => !!ITEM_DATABASE[id])
+        ? [...new Set(p.discoveredItems.filter((id): id is string => typeof id === 'string' && !!ITEM_DATABASE[id]))]
         : d.discoveredItems,
       stats: {
         ordersCompleted: clamp(Math.round(num(stats.ordersCompleted, 0)), 0, 999999),
@@ -183,6 +186,11 @@ export class SaveManager {
       tutorialSeen: !!p.tutorialSeen,
       orderSeq: clamp(Math.round(num(p.orderSeq, d.orderSeq)), 0, Number.MAX_SAFE_INTEGER),
       lastGiftTime: Math.max(0, num(p.lastGiftTime, 0)),
+      lastDaily: Math.max(0, num(p.lastDaily, 0)),
+      dailyStreak: clamp(Math.round(num(p.dailyStreak, 0)), 0, 7),
+      claimedCollection: Array.isArray(p.claimedCollection)
+        ? [...new Set(p.claimedCollection.filter((t): t is number => t === 7 || t === 14 || t === 21))]
+        : [],
     };
   }
 }

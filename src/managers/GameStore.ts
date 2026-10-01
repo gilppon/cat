@@ -10,7 +10,7 @@ import { withJosa } from '../lib/korean';
  * GameStore - Phaser 씬과 React UI 가 함께 쓰는 단일 상태 저장소
  * ========================================================= */
 
-export const ENERGY_REGEN_MS = 20_000;
+export const ENERGY_REGEN_MS = 15_000;
 export const GIFT_COOLDOWN_MS = 3 * 60_000;
 export const REFRESH_ORDER_COST = 10;
 export const MAX_GENERATOR_LEVEL = 3;
@@ -45,6 +45,24 @@ export const ENERGY_PACKS: EnergyPack[] = [
   { id: 'small', label: '에너지 한 줌', desc: '+10 에너지', energy: 10, price: 30 },
   { id: 'medium', label: '에너지 한 바구니', desc: '+30 에너지', energy: 30, price: 80, badge: '인기' },
   { id: 'full', label: '에너지 가득!', desc: '최대치까지 충전', energy: 'full', price: 0 },
+];
+
+/** 출석 1~7일차 보상 (7일 후 1일차로 순환) */
+export const DAILY_REWARDS: Array<{ coins: number; energy: number }> = [
+  { coins: 20, energy: 5 },
+  { coins: 30, energy: 5 },
+  { coins: 40, energy: 10 },
+  { coins: 60, energy: 10 },
+  { coins: 80, energy: 15 },
+  { coins: 100, energy: 15 },
+  { coins: 150, energy: 20 },
+];
+
+/** 도감 수집 보상 (발견 종류 수 기준) */
+export const COLLECTION_TIERS: Array<{ count: number; coins: number; energy: number }> = [
+  { count: 7, coins: 50, energy: 5 },
+  { count: 14, coins: 120, energy: 10 },
+  { count: 21, coins: 250, energy: 20 },
 ];
 
 export interface GameSnapshot {
@@ -87,6 +105,15 @@ export function canAffordAnyTask(data: PlayerData): boolean {
 
 export function energyFullPrice(data: PlayerData): number {
   return Math.max(10, Math.ceil(Math.max(0, data.maxEnergy - data.energy) * 2.5));
+}
+
+/** 인터랙티브 튜토리얼 단계 (저장된 스탯에서 파생, 리로드에도 강함) */
+export function tutorialStep(data: PlayerData): 0 | 1 | 2 | 3 {
+  if (data.tutorialSeen) return 3;
+  if (data.stats.mergesDone < 1) return 0;
+  if (data.stats.ordersCompleted < 1) return 1;
+  if (!data.completedTasks.includes('yard_weeds')) return 2;
+  return 3;
 }
 
 type Listener = () => void;
@@ -182,6 +209,12 @@ class GameStore {
     const toast: Toast = { id: ++this.toastSeq, text, tone, ...extra };
     this.toasts = [...this.toasts.slice(-2), toast];
     window.setTimeout(() => this.dismissToast(toast.id), tone === 'reward' ? 2900 : 2400);
+  }
+
+  private addEnergy(amount: number): number {
+    const gain = Math.min(Math.max(0, this.data.maxEnergy - this.data.energy), amount);
+    this.data.energy += gain;
+    return gain;
   }
 
   private inBounds(p: CellPos) {
@@ -366,11 +399,16 @@ class GameStore {
     );
     d.orders = d.orders.map((o, i) => (i === idx ? next : o));
     this.emitBoard({ type: 'remove', at: pos, reason: 'deliver' });
-    this.pushToast(`${withJosa(order.petName, '이/가')} 행복해졌어요!`, 'reward', {
-      icon: '💖',
-      coins: order.rewardCoins,
-      hearts: order.rewardHearts,
-    });
+    const goldenDelivered = !!order.golden;
+    this.pushToast(
+      goldenDelivered ? `황금 주문 달성! ${withJosa(order.petName, '이/가')} 크게 기뻐해요! 👑` : `${withJosa(order.petName, '이/가')} 행복해졌어요!`,
+      'reward',
+      {
+        icon: goldenDelivered ? '👑' : '💖',
+        coins: order.rewardCoins,
+        hearts: order.rewardHearts,
+      },
+    );
     this.commit();
     return true;
   }
@@ -491,10 +529,81 @@ class GameStore {
     const d = this.data;
     if (now - d.lastGiftTime < GIFT_COOLDOWN_MS) return false;
     d.lastGiftTime = now;
-    d.energy = Math.min(d.maxEnergy, d.energy + 5);
+    const energy = this.addEnergy(5);
     d.coins = Math.min(999999, d.coins + 10);
-    this.pushToast('쉼터 후원 선물이 도착했어요!', 'reward', { icon: '🎁', energy: 5, coins: 10 });
+    this.pushToast('쉼터 후원 선물이 도착했어요!', 'reward', { icon: '🎁', energy, coins: 10 });
     sfx.buy();
+    this.commit();
+    return true;
+  }
+
+  /** 보상형광고 시청 보상 (포털 SDK 성공 후 호출) */
+  grantAdReward(kind: 'energy' | 'giftBonus'): void {
+    const d = this.data;
+    if (kind === 'energy') {
+      const gain = this.addEnergy(15);
+      this.pushToast('광고 보상! 에너지 충전 ⚡', 'reward', { icon: '🎬', energy: gain });
+    } else {
+      const gain = this.addEnergy(5);
+      d.coins = Math.min(999999, d.coins + 10);
+      this.pushToast('후원 선물 2배! 🎁🎁', 'reward', { icon: '🎬', energy: gain, coins: 10 });
+    }
+    sfx.buy();
+    this.commit();
+  }
+
+  /* ---------------- 일일보상 & 도감 보상 ---------------- */
+  private dailyReward(day: number): { coins: number; energy: number } {
+    return DAILY_REWARDS[Math.min(Math.max(day, 1), 7) - 1] ?? { coins: 20, energy: 5 };
+  }
+
+  dailyStatus(): { available: boolean; streakDay: number; coins: number; energy: number } {
+    const d = this.data;
+    const now = Date.now();
+    const today = new Date(now).toDateString();
+    if (d.lastDaily > 0 && new Date(d.lastDaily).toDateString() === today) {
+      const r = this.dailyReward(d.dailyStreak);
+      return { available: false, streakDay: Math.min(Math.max(d.dailyStreak, 1), 7), coins: r.coins, energy: r.energy };
+    }
+    const yesterday = new Date(now - 86400000).toDateString();
+    const continued = d.lastDaily > 0 && new Date(d.lastDaily).toDateString() === yesterday;
+    const next = continued ? (d.dailyStreak % 7) + 1 : 1;
+    const r = this.dailyReward(next);
+    return { available: true, streakDay: next, coins: r.coins, energy: r.energy };
+  }
+
+  claimDaily(): boolean {
+    const st = this.dailyStatus();
+    if (!st.available) return false;
+    const d = this.data;
+    d.lastDaily = Date.now();
+    d.dailyStreak = st.streakDay;
+    d.coins = Math.min(999999, d.coins + st.coins);
+    const energy = this.addEnergy(st.energy);
+    this.pushToast(`출석 ${st.streakDay}일째 보상! 내일도 와주세요 📅`, 'reward', {
+      icon: '📅',
+      coins: st.coins,
+      energy,
+    });
+    sfx.buy();
+    this.commit();
+    return true;
+  }
+
+  claimCollection(tier: number): boolean {
+    const def = COLLECTION_TIERS.find((t) => t.count === tier);
+    const d = this.data;
+    if (!def || d.claimedCollection.includes(tier)) return false;
+    if (d.discoveredItems.length < tier) return false;
+    d.claimedCollection.push(tier);
+    d.coins = Math.min(999999, d.coins + def.coins);
+    const energy = this.addEnergy(def.energy);
+    this.pushToast(`도감 ${tier}종 달성! 수집가 보상 🏆`, 'reward', {
+      icon: '📚',
+      coins: def.coins,
+      energy,
+    });
+    sfx.fanfare();
     this.commit();
     return true;
   }
@@ -510,7 +619,20 @@ class GameStore {
     this.commit(false);
   }
 
-  markTutorialSeen() {
+  /** 인터랙티브 튜토리얼 완료: 수료 보상 + seen 처리 */
+  finishTutorial() {
+    const d = this.data;
+    if (d.tutorialSeen) return;
+    d.tutorialSeen = true;
+    d.coins = Math.min(999999, d.coins + 30);
+    const energy = this.addEnergy(10);
+    this.pushToast('튜토리얼 완료! 환영 선물 도착 🎁', 'reward', { icon: '🎓', coins: 30, energy });
+    sfx.fanfare();
+    this.commit();
+  }
+
+  /** 튜토리얼 건너뛰기: 보상 없이 seen 처리 */
+  skipTutorial() {
     if (this.data.tutorialSeen) return;
     this.data.tutorialSeen = true;
     this.commit();

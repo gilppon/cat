@@ -19,4 +19,14 @@ describe('SaveManager.normalize', () => {
     expect(d.generatorLevels.toy).toBe(1);
     expect(d.generatorLevels.medicine).toBe(2);
   });
+
+  it('도감 발견 항목은 유효한 고유 id만 유지한다', () => {
+    const d = SaveManager.normalize({ discoveredItems: ['food_1', 'food_1', 'unknown', 7] } as never);
+    expect(d.discoveredItems).toEqual(['food_1']);
+  });
+
+  it('도감 보상 기록은 허용된 티어만 중복 없이 유지한다', () => {
+    const d = SaveManager.normalize({ claimedCollection: [7, 7, 8, 14.5, '21', 21] } as never);
+    expect(d.claimedCollection).toEqual([7, 21]);
+  });
 });

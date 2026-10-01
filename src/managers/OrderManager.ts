@@ -1,8 +1,8 @@
 import type { PetOrder, PlayerData } from '../types/game';
 import { CATEGORIES } from './MergeManager';
-import { ORDER_LINES, PET_NAMES, PET_SPECIES } from '../data/shelter';
+import { ORDER_LINES, PET_NAMES, PET_SPECIES, SHELTER_AREAS } from '../data/shelter';
 
-const HEARTS_BY_LEVEL = [0, 1, 3, 4, 6, 9, 13, 18];
+const HEARTS_BY_LEVEL = [0, 1, 3, 4, 7, 11, 16, 22];
 const LEVEL_RANGE: Record<number, [number, number]> = {
   1: [2, 3],
   2: [2, 4],
@@ -65,16 +65,21 @@ export class OrderManager {
     const reward = OrderManager.rewardFor(level);
     data.orderSeq += 1;
 
+    // 엔드리스: 쉼터 완복 후 25% 확률로 황금 주문 (보상 1.5배)
+    const shelterDone = SHELTER_AREAS.every((a) => a.tasks.every((t) => data.completedTasks.includes(t.id)));
+    const golden = shelterDone && Math.random() < 0.25;
+
     return {
       id: `order_${Date.now().toString(36)}_${data.orderSeq}`,
       petName: pick(names.length ? names : PET_NAMES),
       petType: species.type,
       requiredCategory: category,
       requiredLevel: level,
-      rewardCoins: reward.coins,
-      rewardHearts: reward.hearts,
+      rewardCoins: golden ? Math.round(reward.coins * 1.5) : reward.coins,
+      rewardHearts: golden ? Math.round(reward.hearts * 1.5) : reward.hearts,
       isHealthy: category !== 'medicine',
       message: pick(ORDER_LINES[category]),
+      ...(golden ? { golden: true as const } : {}),
     };
   }
 }

@@ -110,9 +110,14 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
       <article
         className={cx(
           'anim-card-in relative w-[172px] shrink-0 snap-start rounded-[20px] bg-white/90 p-2 shadow-md ring-2',
-          ready ? 'ring-emerald-400' : 'ring-white/70',
+          ready ? 'ring-emerald-400' : order.golden ? 'ring-amber-400' : 'ring-white/70',
         )}
       >
+        {order.golden && (
+          <span className="absolute -top-2 left-2 z-10 rounded-full bg-amber-400 px-1.5 py-px text-[10px] text-amber-950 shadow">
+            👑 황금 주문
+          </span>
+        )}
         {ready && (
           <span className="absolute -top-2 right-2 z-10 rounded-full bg-emerald-500 px-1.5 py-px text-[10px] text-white shadow">
             준비 완료
@@ -140,9 +145,14 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
     <article
       className={cx(
         'anim-card-in relative w-full rounded-[22px] bg-white/90 p-3 shadow-md ring-2 transition-shadow',
-        ready ? 'ring-emerald-400 shadow-emerald-200/70' : 'ring-white/80',
+        ready ? 'ring-emerald-400 shadow-emerald-200/70' : order.golden ? 'ring-amber-300' : 'ring-white/80',
       )}
     >
+      {order.golden && (
+        <span className="absolute -top-2 right-10 z-10 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] text-amber-950 shadow">
+          👑 황금 주문 · 보상 1.5배
+        </span>
+      )}
       {ready && (
         <span className="absolute -top-2 left-3 z-10 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] text-white shadow">
           준비 완료!

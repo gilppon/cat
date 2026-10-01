@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useGame } from '../hooks/useGame';
-import { gameStore, overallProgress } from '../managers/GameStore';
+import { COLLECTION_TIERS, DAILY_REWARDS, gameStore, overallProgress } from '../managers/GameStore';
 import type { ToastTone } from '../managers/GameStore';
 import { CATEGORIES, CATEGORY_META, ITEM_DATABASE, MergeManager } from '../managers/MergeManager';
 import { PET_SPECIES, SHELTER_AREAS } from '../data/shelter';
@@ -106,7 +106,7 @@ export function CelebrationModal() {
       <Confetti />
       <div className="anim-scale-in relative w-full max-w-md overflow-hidden rounded-[30px] bg-white shadow-2xl">
         <div className="relative aspect-[16/9] overflow-hidden">
-          <img src={asset(area.image)} alt={area.name} decoding="async" className="anim-restore h-full w-full object-cover" />
+          <img src={asset(area.image)} alt={area.name} decoding="async" loading="lazy" className="anim-restore h-full w-full object-cover" />
           <div className="absolute inset-x-0 top-3 flex justify-center">
             <span className="anim-shine rounded-full bg-amber-400 px-4 py-1.5 text-sm text-white shadow-lg">✨ 복원 완료 ✨</span>
           </div>
@@ -123,6 +123,7 @@ export function CelebrationModal() {
               <img
                 src={asset(pet.image)}
                 decoding="async"
+                loading="lazy"
                 alt={pet.label}
                 className="anim-float h-16 w-16 rounded-2xl object-cover shadow ring-4 ring-white"
               />
@@ -147,6 +148,47 @@ export function CelebrationModal() {
             계속 돌보러 가기
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- 출석 보상 ---------------- */
+export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { streakDay: number; coins: number; energy: number; onClaim: () => void; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[70] grid place-items-center p-4">
+      <div className="anim-fade-in absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="anim-scale-in relative w-full max-w-sm rounded-[28px] bg-[#FFFBF4] p-5 text-center shadow-2xl">
+        <div className="text-5xl">📅</div>
+        <h3 className="mt-1 text-xl text-slate-800">출석 {streakDay}일째!</h3>
+        <p className="mt-0.5 text-xs text-slate-500">매일 오면 보상이 커져요 · 7일 뒤엔 1일차부터 다시 시작</p>
+        <div className="mt-3 grid grid-cols-7 gap-1">
+          {DAILY_REWARDS.map((r, i) => (
+            <div
+              key={i}
+              className={cx(
+                'rounded-xl px-0.5 py-1.5 text-center ring-1',
+                i + 1 < streakDay
+                  ? 'bg-emerald-50 text-emerald-600 ring-emerald-200'
+                  : i + 1 === streakDay
+                    ? 'bg-amber-100 text-amber-800 ring-amber-300'
+                    : 'bg-white text-slate-400 ring-black/5',
+              )}
+            >
+              <div className="text-[10px] font-bold">{i + 1}일</div>
+              <div className="text-[9px] tabular-nums">{r.coins}💰</div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={onClaim}
+          className="anim-pulse-cta mt-4 w-full rounded-full bg-linear-to-b from-amber-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"
+        >
+          💰{coins} + ⚡{energy} 받기
+        </button>
+        <button onClick={onClose} className="mt-2 w-full py-1 text-xs text-slate-400">
+          나중에 받기
+        </button>
       </div>
     </div>
   );
@@ -183,7 +225,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
       </div>
       <div className="mt-3 rounded-2xl bg-sky-50 p-3 text-xs leading-relaxed text-sky-800 ring-1 ring-sky-100">
         💡 아이템을 탭하면 정보를 보고 판매할 수 있어요 · ✅ 배지가 붙은 아이템은 바로 전달할 수 있어요 · 요청 카드의
-        아이콘을 누르면 보드에서 찾아줘요 · 에너지는 20초마다 1씩 회복돼요
+        아이콘을 누르면 보드에서 찾아줘요 · 에너지는 15초마다 1씩 회복돼요
       </div>
 
       <h4 className="mb-2 mt-5 text-base text-slate-800">
@@ -192,6 +234,34 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
           ({d.discoveredItems.length}/{total})
         </span>
       </h4>
+      <div className="mb-2 grid grid-cols-3 gap-1.5">
+        {COLLECTION_TIERS.map((t) => {
+          const claimed = d.claimedCollection.includes(t.count);
+          const ready = d.discoveredItems.length >= t.count && !claimed;
+          return (
+            <button
+              key={t.count}
+              disabled={!ready}
+              onClick={() => gameStore.claimCollection(t.count)}
+              className={cx(
+                'rounded-2xl px-2 py-2 text-center text-[11px] ring-1 transition active:scale-95 disabled:opacity-70',
+                claimed
+                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                  : ready
+                    ? 'anim-pulse-soft bg-amber-100 text-amber-800 ring-amber-300'
+                    : 'bg-white text-slate-400 ring-black/5',
+              )}
+            >
+              <div className="font-bold">
+                {claimed ? '✅' : '🏆'} {t.count}종
+              </div>
+              <div className="tabular-nums">
+                {claimed ? '수령 완료' : `💰${t.coins} ⚡${t.energy}`}
+              </div>
+            </button>
+          );
+        })}
+      </div>
       <div className="space-y-2">
         {CATEGORIES.map((cat) => {
           const meta = CATEGORY_META[cat];

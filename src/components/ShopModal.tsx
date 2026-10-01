@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useGame, useNow } from '../hooks/useGame';
 import { ENERGY_PACKS, ENERGY_REGEN_MS, GIFT_COOLDOWN_MS, energyFullPrice, gameStore } from '../managers/GameStore';
+import { Ads } from '../lib/ads';
 import type { PlayerData } from '../types/game';
 import { BoltIcon, CoinIcon, Modal, cx } from './ui';
 
@@ -7,10 +9,33 @@ const PACK_ICON: Record<string, string> = { small: '⚡', medium: '🔋', full: 
 
 function ShopContent({ data }: { data: PlayerData }) {
   const now = useNow(1000);
+  const [adBusy, setAdBusy] = useState(false);
   const giftLeft = Math.max(0, GIFT_COOLDOWN_MS - (now - data.lastGiftTime));
   const giftReady = giftLeft <= 0;
   const totalSecs = Math.ceil(giftLeft / 1000);
   const timer = `${Math.floor(totalSecs / 60)}:${String(totalSecs % 60).padStart(2, '0')}`;
+
+  const watchEnergyAd = async () => {
+    if (adBusy || data.energy >= data.maxEnergy) return;
+    setAdBusy(true);
+    try {
+      const ok = await Ads.rewardedBreak();
+      if (ok) gameStore.grantAdReward('energy');
+    } finally {
+      setAdBusy(false);
+    }
+  };
+
+  const watchGiftAd = async () => {
+    if (adBusy || !giftReady) return;
+    setAdBusy(true);
+    try {
+      const ok = await Ads.rewardedBreak();
+      if (ok && gameStore.claimGift()) gameStore.grantAdReward('giftBonus');
+    } finally {
+      setAdBusy(false);
+    }
+  };
 
   return (
     <Modal title="⚡ 에너지 상점" onClose={() => gameStore.setShopOpen(false)}>
@@ -80,8 +105,30 @@ function ShopContent({ data }: { data: PlayerData }) {
         </button>
       </div>
 
+      <button
+        disabled={adBusy || data.energy >= data.maxEnergy}
+        onClick={watchEnergyAd}
+        className={cx(
+          'mt-2 flex w-full items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm transition',
+          adBusy || data.energy >= data.maxEnergy
+            ? 'bg-slate-100 text-slate-400'
+            : 'anim-pulse-soft bg-linear-to-b from-violet-500 to-purple-600 text-white shadow active:scale-95',
+        )}
+      >
+        🎬 {adBusy ? '광고 로딩 중...' : '광고 보고 에너지 +15 충전'}
+      </button>
+      {giftReady && (
+        <button
+          disabled={adBusy}
+          onClick={watchGiftAd}
+          className="mt-2 w-full rounded-2xl bg-white px-3 py-2 text-xs text-slate-500 ring-1 ring-black/5 transition active:scale-95 disabled:opacity-50"
+        >
+          🎬 광고 보고 후원 선물 2배로 받기
+        </button>
+      )}
+
       <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-400">
-        에너지는 {ENERGY_REGEN_MS / 1000}초마다 1씩 자동으로 회복돼요 · 모든 구매는 게임 코인으로만 이루어져요
+        에너지는 {ENERGY_REGEN_MS / 1000}초마다 1씩 자동으로 회복돼요 · 코인 구매 외에 광고 보상도 있어요
       </p>
     </Modal>
   );

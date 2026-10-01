@@ -39,6 +39,8 @@ export interface PetOrder {
   isHealthy: boolean;
   /** 확장: 말풍선 대사 */
   message: string;
+  /** 확장: 엔드리스 황금 주문 (보상 1.5배) */
+  golden?: boolean;
 }
 
 export type GeneratorLevels = Record<ItemCategory, number>;
@@ -67,6 +69,9 @@ export interface PlayerData {
   tutorialSeen: boolean;
   orderSeq: number;
   lastGiftTime: number;
+  lastDaily: number;
+  dailyStreak: number;
+  claimedCollection: number[];
 }
 
 /** GameStore -> Phaser MainScene 으로 전달되는 보드 변화 이벤트 */

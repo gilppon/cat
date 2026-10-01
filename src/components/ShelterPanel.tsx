@@ -205,7 +205,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
                     )}
                     style={{ backgroundColor: sp.color }}
                   >
-                    <img src={asset(sp.image)} alt={sp.label} draggable={false} decoding="async" className="h-full w-full scale-110 object-cover" />
+                    <img src={asset(sp.image)} alt={sp.label} draggable={false} decoding="async" loading="lazy" className="h-full w-full scale-110 object-cover" />
                     {!unlocked && (
                       <span className="absolute inset-0 grid place-items-center bg-slate-900/40 text-sm">🔒</span>
                     )}

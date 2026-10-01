@@ -8,8 +8,11 @@ import OrdersPanel from './components/OrdersPanel';
 import PhaserBoard from './components/PhaserBoard';
 import ItemInfoBar from './components/ItemInfoBar';
 import ShelterPanel from './components/ShelterPanel';
+import TutorialOverlay from './components/TutorialOverlay';
+import AdOverlay, { type AdState } from './components/AdOverlay';
+import { Ads, registerAdUI } from './lib/ads';
 import ShopModal from './components/ShopModal';
-import { CelebrationModal, HelpModal, SettingsModal, Toasts } from './components/Overlays';
+import { CelebrationModal, DailyModal, HelpModal, SettingsModal, Toasts } from './components/Overlays';
 import { cx } from './components/ui';
 
 interface NavProps {
@@ -58,8 +61,44 @@ export default function App() {
   const [shelterOpen, setShelterOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [ad, setAd] = useState<AdState | null>(null);
+  const [dailyDismissed, setDailyDismissed] = useState(false);
   const snap = useGame();
   const badge = canAffordAnyTask(snap.data);
+  const daily = gameStore.dailyStatus();
+  const showDaily = started && !dailyDismissed && daily.available;
+
+  // 광고 SDK 초기화 + 모의광고 UI 등록
+  useEffect(() => {
+    registerAdUI((kind, done) => setAd({ kind, done }));
+    void Ads.init();
+    return () => registerAdUI(null);
+  }, []);
+
+  // 포털-compliant focus handling: Phaser already freezes the scene on blur,
+  // but the portal must also stop counting gameplay time in the background.
+  useEffect(() => {
+    if (!started) return;
+    const onAway = () => {
+      if (document.hidden) Ads.gameplayStop();
+    };
+    const onBack = () => {
+      if (!document.hidden) Ads.gameplayStart();
+    };
+    const onBlur = () => Ads.gameplayStop();
+    const onFocus = () => Ads.gameplayStart();
+
+    document.addEventListener('visibilitychange', onAway);
+    document.addEventListener('visibilitychange', onBack);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', onAway);
+      document.removeEventListener('visibilitychange', onBack);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [started]);
 
   // 에너지 자동 회복 (TopBar의 useNow 1s 타이머와 분리 유지: tick은 저장소 갱신용, useNow는 표시용)
   useEffect(() => {
@@ -70,12 +109,14 @@ export default function App() {
   const start = () => {
     sfx.unlock();
     setStarted(true);
-    if (!gameStore.live.tutorialSeen) setHelpOpen(true);
+    Ads.gameplayStart();
+    // 첫 플레이는 인터랙티브 튜토리얼이 안내하므로 HelpModal 자동오픈 생략
+    if (gameStore.live.tutorialSeen) return;
+    setHelpOpen(false);
   };
 
   const closeHelp = useCallback(() => {
     setHelpOpen(false);
-    gameStore.markTutorialSeen();
   }, []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const openShop = useCallback(() => gameStore.setShopOpen(true), []);
@@ -134,6 +175,28 @@ export default function App() {
 
       <ShopModal />
       <CelebrationModal />
+      <TutorialOverlay />
+      {showDaily && (
+        <DailyModal
+          streakDay={daily.streakDay}
+          coins={daily.coins}
+          energy={Math.min(daily.energy, snap.data.maxEnergy - snap.data.energy)}
+          onClaim={() => {
+            gameStore.claimDaily();
+            setDailyDismissed(true);
+          }}
+          onClose={() => setDailyDismissed(true)}
+        />
+      )}
+      {ad && (
+        <AdOverlay
+          kind={ad.kind}
+          onDone={(ok) => {
+            setAd(null);
+            ad.done(ok);
+          }}
+        />
+      )}
       {helpOpen && <HelpModal onClose={closeHelp} />}
       {menuOpen && <SettingsModal onClose={closeMenu} onHelp={() => setHelpOpen(true)} />}
       <Toasts />

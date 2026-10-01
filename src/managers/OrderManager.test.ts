@@ -1,5 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { OrderManager } from './OrderManager';
+import { SaveManager } from './SaveManager';
+import { SHELTER_AREAS } from '../data/shelter';
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('OrderManager', () => {
   it('레벨 범위는 shelterLevel에 따라 달라진다', () => {
@@ -17,5 +21,21 @@ describe('OrderManager', () => {
     const high = OrderManager.rewardFor(5, false);
     expect(high.coins).toBeGreaterThan(low.coins);
     expect(high.hearts).toBeGreaterThanOrEqual(low.hearts);
+  });
+
+  it('황금 주문은 쉼터 완복 이후에만 생성되고 보상을 1.5배 지급한다', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const data = SaveManager.createDefault();
+
+    const beforeCompletion = OrderManager.create(data, []);
+    expect(beforeCompletion.golden).toBeUndefined();
+
+    data.completedTasks = SHELTER_AREAS.flatMap((area) => area.tasks.map((task) => task.id));
+    const golden = OrderManager.create(data, []);
+    const base = OrderManager.rewardFor(golden.requiredLevel, true);
+
+    expect(golden.golden).toBe(true);
+    expect(golden.rewardCoins).toBe(Math.round(base.coins * 1.5));
+    expect(golden.rewardHearts).toBe(Math.round(base.hearts * 1.5));
   });
 });

@@ -28,7 +28,7 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-sky-200">
-      <img src={asset('images/areas/yard.jpg')} alt="" decoding="async" className="anim-kenburns absolute inset-0 h-full w-full object-cover" />
+      <img src={asset('images/areas/yard.webp')} alt="" decoding="async" fetchPriority="high" className="anim-kenburns absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-linear-to-b from-sky-900/25 via-transparent to-amber-950/50" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {paws.map((p, i) => (
