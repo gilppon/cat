@@ -28,12 +28,12 @@ function TaskRow({ task, data }: { task: RestoreTask; data: PlayerData }) {
           <div className="mt-0.5 flex items-center gap-2 text-xs tabular-nums">
             <span className={cx('flex items-center gap-0.5', heartOk ? 'text-rose-500' : 'text-slate-400')}>
               <HeartIcon className="h-3.5 w-3.5" />
-              {task.hearts}
+              {task.hearts.toLocaleString('en-US')}
             </span>
             {task.coins > 0 && (
               <span className={cx('flex items-center gap-0.5', coinOk ? 'text-amber-600' : 'text-slate-400')}>
                 <CoinIcon className="h-3.5 w-3.5" />
-                {task.coins}
+                {task.coins.toLocaleString('en-US')}
               </span>
             )}
           </div>
@@ -117,13 +117,13 @@ function AreaCard({ area, index, data, active }: { area: ShelterArea; index: num
         {!unlocked && (
           <div className="absolute inset-0 grid place-items-center">
             <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs text-slate-600 shadow">
-              🔒 Restore the previous area to unlock
+              🔒 Restore the previous area first
             </span>
           </div>
         )}
         {complete && (
           <span className="anim-shine absolute right-2 top-2 rounded-full bg-amber-400 px-2.5 py-1 text-xs text-white shadow">
-            Restored ✨
+            Restored
           </span>
         )}
       </button>
@@ -164,7 +164,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
             <h2 className="text-xl text-slate-800">🏡 Restore Shelter</h2>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">Shelter Lv.{d.shelterLevel}</span>
+            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-700">🏠 Shelter Lv.{d.shelterLevel}</span>
             {onClose && (
               <button
                 onClick={onClose}
@@ -218,7 +218,7 @@ export default function ShelterPanel({ onClose }: { onClose?: () => void }) {
           <div className="flex flex-col items-end gap-1 text-xs tabular-nums">
             <span className="flex items-center gap-1 rounded-full bg-white px-2 py-0.5 shadow-sm ring-1 ring-black/5">
               <HeartIcon className="h-4 w-4" />
-              {d.hearts}
+              {d.hearts.toLocaleString('en-US')}
             </span>
             <span className="flex items-center gap-1 rounded-full bg-white px-2 py-0.5 shadow-sm ring-1 ring-black/5">
               <CoinIcon className="h-4 w-4" />

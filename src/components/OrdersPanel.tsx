@@ -46,11 +46,11 @@ function Rewards({ order }: { order: PetOrder }) {
     <div className="flex items-center gap-1.5 text-xs tabular-nums text-slate-700">
       <span className="flex items-center gap-0.5">
         <CoinIcon className="h-4 w-4" />
-        {order.rewardCoins}
+        {order.rewardCoins.toLocaleString('en-US')}
       </span>
       <span className="flex items-center gap-0.5">
         <HeartIcon className="h-4 w-4" />
-        {order.rewardHearts}
+        {order.rewardHearts.toLocaleString('en-US')}
       </span>
     </div>
   );
@@ -180,7 +180,7 @@ function OrderCard({ order, board, column }: { order: PetOrder; board: Board; co
             {ready
               ? 'On your board! Ready to deliver'
               : best > 0
-                ? `Board best Lv.${best} / need Lv.${item.level}`
+                ? `Best Lv.${best} · need Lv.${item.level}`
                 : 'Not on the board yet'}
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function OrdersPanel({ layout }: { layout: 'row' | 'column' }) {
     <section className={cx('w-full', column && 'flex min-h-0 flex-1 flex-col')}>
       <div className="mb-1.5 flex items-center justify-between px-1">
         <h2 className={cx('text-slate-700', column ? 'text-base' : 'text-[13px]')}>🐾 Friends Needing Help</h2>
-        <span className="text-[11px] text-slate-500">{d.stats.ordersCompleted} cared for</span>
+        <span className="text-[11px] text-slate-500">{d.stats.ordersCompleted.toLocaleString('en-US')} cared for</span>
       </div>
       <div
         className={cx(

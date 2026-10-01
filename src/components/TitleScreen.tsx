@@ -7,7 +7,7 @@ import { asset } from '../lib/assets';
 
 const FEATURES = [
   { icon: '🧩', text: 'Merge matching\nitems' },
-  { icon: '🐾', text: 'Answer your\nfriends' },
+  { icon: '🐾', text: 'Help your\nfriends' },
   { icon: '🏡', text: 'Restore an old\nshelter' },
 ];
 
@@ -55,11 +55,11 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
           <div className="anim-float mx-auto mb-3 grid h-16 w-16 place-items-center rounded-[22px] bg-linear-to-br from-amber-300 to-orange-400 text-3xl shadow-lg ring-4 ring-white">
             🐾
           </div>
-          <p className="text-sm tracking-wide text-sky-700">Pet Shelter Restore Merge</p>
+          <p className="text-sm tracking-wide text-sky-700">Pet Shelter Merge</p>
           <h1 className="mt-1 text-[40px] leading-[1.05] text-slate-800 sm:text-5xl">Pets Harbor</h1>
           <p className="text-xl text-orange-500 sm:text-2xl">&amp; Home Restore</p>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
-            Rebuild an abandoned harbor shelter and give hurt little friends a warm home.
+            Rebuild an abandoned seaside shelter and give hurt little friends a warm home.
           </p>
 
           <div className="mt-4 flex justify-center -space-x-2">
@@ -91,7 +91,7 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
             onClick={onStart}
             className="anim-pulse-cta mt-6 w-full rounded-full bg-linear-to-b from-orange-400 to-orange-500 py-3.5 text-xl text-white shadow-lg transition active:scale-[0.98]"
           >
-            {hasSave ? '▶ Keep Playing' : '▶ Start Game'}
+            {hasSave ? '▶ Continue' : '▶ Play'}
           </button>
           {hasSave && (
             <button
@@ -106,12 +106,12 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
               }}
               className="mt-3 text-xs text-slate-400 underline underline-offset-2 hover:text-slate-600"
             >
-              {confirmReset ? 'Really start over? (tap again)' : 'Start over from the beginning'}
+              {confirmReset ? 'Really start over? Tap again to erase all progress' : 'Start over from the beginning'}
             </button>
           )}
         </div>
         <p className="mt-4 text-center text-xs text-white/90 drop-shadow">
-          Phaser 3 · React · TypeScript · Progress saves automatically
+          Progress saves automatically in this browser
         </p>
       </div>
     </div>

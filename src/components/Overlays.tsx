@@ -115,7 +115,7 @@ export function CelebrationModal() {
           <div className="text-2xl text-slate-800">🎉 {area.name} restored!</div>
           <p className="mt-1 text-sm text-slate-500">
             {isFinal
-              ? 'The abandoned harbor shelter is a warm home for everyone again!'
+              ? 'The abandoned seaside shelter is a warm home for everyone again!'
               : 'The shelter feels even warmer and cozier now.'}
           </p>
           {pet && (
@@ -139,7 +139,7 @@ export function CelebrationModal() {
                 {r}
               </li>
             ))}
-            <li className="rounded-xl bg-emerald-50 px-3 py-2">⚡ Bonus: energy filled to full!</li>
+            <li className="rounded-xl bg-emerald-50 px-3 py-2">⚡ Bonus: energy refilled to full!</li>
           </ul>
           <button
             onClick={() => gameStore.closeCelebration()}
@@ -161,7 +161,7 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
       <div className="anim-scale-in relative w-full max-w-sm rounded-[28px] bg-[#FFFBF4] p-5 text-center shadow-2xl">
         <div className="text-5xl">📅</div>
         <h3 className="mt-1 text-xl text-slate-800">Day {streakDay} streak!</h3>
-        <p className="mt-0.5 text-xs text-slate-500">Come back daily for bigger rewards · resets to day 1 after 7</p>
+        <p className="mt-0.5 text-xs text-slate-500">Check in daily for bigger rewards · The streak resets to day 1 after 7 days</p>
         <div className="mt-3 grid grid-cols-7 gap-1">
           {DAILY_REWARDS.map((r, i) => (
             <div
@@ -176,7 +176,7 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
               )}
             >
               <div className="text-[10px] font-bold">{i + 1}d</div>
-              <div className="text-[9px] tabular-nums">{r.coins}💰</div>
+              <div className="text-[9px] tabular-nums">{r.coins.toLocaleString('en-US')}💰</div>
             </div>
           ))}
         </div>
@@ -184,7 +184,7 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
           onClick={onClaim}
           className="anim-pulse-cta mt-4 w-full rounded-full bg-linear-to-b from-amber-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"
         >
-          💰{coins} + ⚡{energy} Claim
+          Claim 💰{coins.toLocaleString('en-US')} + ⚡{energy.toLocaleString('en-US')}
         </button>
         <button onClick={onClose} className="mt-2 w-full py-1 text-xs text-slate-400">
           Maybe later
@@ -196,10 +196,10 @@ export function DailyModal({ streakDay, coins, energy, onClaim, onClose }: { str
 
 /* ---------------- Help & collection ---------------- */
 const STEPS = [
-  { icon: '🧺', title: 'Tap the generators', text: 'Tap the Food Pantry, Toy Box or First Aid Box to spawn an item for ⚡1 energy.' },
-  { icon: '🧩', title: 'Merge matching items', text: 'Drag two identical items together to upgrade one step. (Max Lv.7)' },
-  { icon: '🐾', title: 'Help your friends', text: 'When a request card matches an item on your board, hit "Deliver" for coins and hearts.' },
-  { icon: '🏡', title: 'Restore the shelter', text: 'Spend hearts and coins to restore areas, welcome new animal friends and upgrade generators.' },
+  { icon: '🧺', title: 'Tap the generators', text: 'Tap the Food Pantry, Toy Box or First Aid Box to make an item for ⚡1 energy.' },
+  { icon: '🧩', title: 'Merge matching items', text: 'Drag two identical items together to merge them into the next level. (Max Lv.7)' },
+  { icon: '🐾', title: 'Help your friends', text: 'When a request card matches an item on your board, tap "Deliver" to earn coins and hearts.' },
+  { icon: '🏡', title: 'Restore the shelter', text: 'Spend hearts and coins to restore areas, welcome new animal friends, and upgrade generators.' },
 ];
 
 export function HelpModal({ onClose }: { onClose: () => void }) {
@@ -224,7 +224,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
         ))}
       </div>
       <div className="mt-3 rounded-2xl bg-sky-50 p-3 text-xs leading-relaxed text-sky-800 ring-1 ring-sky-100">
-        💡 Tap an item to see details and sell it · ✅ Badged items can be delivered right away · Tap an icon on a
+        💡 Tap an item to see details and sell it · ✅ Items with a ✅ badge can be delivered right away · Tap an icon on a
         request card to find it on the board · Energy refills by 1 every 15 seconds
       </div>
 
@@ -256,7 +256,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
                 {claimed ? '✅' : '🏆'} {t.count} items
               </div>
               <div className="tabular-nums">
-                {claimed ? 'Claimed' : `💰${t.coins} ⚡${t.energy}`}
+                {claimed ? 'Claimed' : `💰${t.coins.toLocaleString('en-US')} ⚡${t.energy.toLocaleString('en-US')}`}
               </div>
             </button>
           );
@@ -318,9 +318,9 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
   };
 
   const stats = [
-    { label: 'Friends cared for', value: `${d.stats.ordersCompleted}`, icon: '🐾' },
-    { label: 'Merges', value: `${d.stats.mergesDone}`, icon: '🧩' },
-    { label: 'Items made', value: `${d.stats.itemsSpawned}`, icon: '📦' },
+    { label: 'Friends cared for', value: d.stats.ordersCompleted.toLocaleString('en-US'), icon: '🐾' },
+    { label: 'Merges done', value: d.stats.mergesDone.toLocaleString('en-US'), icon: '🧩' },
+    { label: 'Items made', value: d.stats.itemsSpawned.toLocaleString('en-US'), icon: '📦' },
     { label: 'Shelter progress', value: `${Math.round(overallProgress(d) * 100)}%`, icon: '🏡' },
   ];
 
@@ -374,7 +374,7 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
       >
         {confirm ? 'Really reset? Tap again to erase all progress' : '🗑️ Reset Progress'}
       </button>
-      <p className="mt-3 text-center text-[11px] text-slate-400">Progress auto-saves in this browser (localStorage)</p>
+      <p className="mt-3 text-center text-[11px] text-slate-400">Progress saves automatically in this browser</p>
     </Modal>
   );
 }

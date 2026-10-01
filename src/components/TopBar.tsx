@@ -70,7 +70,7 @@ export default function TopBar({ onShop, onMenu, onShelter, shelterBadge }: TopB
           🐾
         </div>
         <div className="hidden leading-tight md:block">
-          <div className="text-[11px] text-sky-800/70">Pet Shelter Restore Merge</div>
+          <div className="text-[11px] text-sky-800/70">Pet Shelter Merge</div>
           <div className="text-lg text-slate-800">Pets Harbor</div>
         </div>
         <span className="hidden rounded-full bg-white/85 px-2.5 py-1 text-xs text-amber-700 ring-1 ring-amber-200 sm:inline-flex">

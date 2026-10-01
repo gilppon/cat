@@ -42,9 +42,9 @@ export interface EnergyPack {
 }
 
 export const ENERGY_PACKS: EnergyPack[] = [
-  { id: 'small', label: 'Energy Handful', desc: '+10 energy', energy: 10, price: 30 },
-  { id: 'medium', label: 'Energy Basket', desc: '+30 energy', energy: 30, price: 80, badge: 'Popular' },
-  { id: 'full', label: 'Energy Full!', desc: 'Fill to the max', energy: 'full', price: 0 },
+  { id: 'small', label: 'Small Pack', desc: '+10 energy', energy: 10, price: 30 },
+  { id: 'medium', label: 'Big Pack', desc: '+30 energy', energy: 30, price: 80, badge: 'Popular' },
+  { id: 'full', label: 'Full Refill', desc: 'Fill to the max', energy: 'full', price: 0 },
 ];
 
 /** Daily login rewards for days 1~7 (cycles back to day 1 after 7) */
@@ -328,7 +328,7 @@ class GameStore {
     }
 
     if (a.id === target.id && a.level >= a.maxLevel) {
-      this.pushToast('Max level items cannot merge further', 'info', { icon: '🏆' });
+      this.pushToast('Max level items can\'t merge any further', 'info', { icon: '🏆' });
     }
     toRow[to.col] = a;
     fromRow[from.col] = target;
@@ -424,7 +424,7 @@ class GameStore {
     this.data.coins = Math.min(999999, this.data.coins + price);
     if (this.samePos(this.selected, pos)) this.selected = null;
     this.emitBoard({ type: 'remove', at: pos, reason: 'sell', value: price });
-    this.pushToast(`${item.emoji} Sold ${withJosa(item.name, 'object')}`, 'info', { icon: '💰', coins: price });
+    this.pushToast(`Sold ${item.name}`, 'info', { icon: '💰', coins: price });
     this.commit();
   }
 
@@ -472,7 +472,7 @@ class GameStore {
       this.celebration = area.id;
       sfx.fanfare();
     } else {
-      this.pushToast(`${task.emoji} ${task.name} done!`, 'success', { icon: '✨' });
+      this.pushToast(`${task.emoji} ${task.name} — done!`, 'success', { icon: '✨' });
       sfx.restore();
     }
     this.commit();
@@ -484,7 +484,7 @@ class GameStore {
     const idx = d.orders.findIndex((o) => o.id === orderId);
     if (idx < 0) return false;
     if (d.coins < REFRESH_ORDER_COST) {
-      this.pushToast(`Calling a new friend costs ${REFRESH_ORDER_COST} coins`, 'warn', { icon: '💰' });
+      this.pushToast(`Calling another friend costs ${REFRESH_ORDER_COST} coins`, 'warn', { icon: '💰' });
       sfx.error();
       this.commit(false);
       return false;
@@ -520,7 +520,7 @@ class GameStore {
     const gain = pack.energy === 'full' ? d.maxEnergy - d.energy : pack.energy;
     d.coins -= price;
     d.energy = Math.min(d.maxEnergy, d.energy + gain);
-    this.pushToast(`${pack.label} filled up!`, 'success', { icon: '⚡', energy: gain });
+    this.pushToast(`${pack.label} purchased!`, 'success', { icon: '⚡', energy: gain });
     sfx.buy();
     this.commit();
     return true;
@@ -544,7 +544,7 @@ class GameStore {
     const d = this.data;
     if (kind === 'energy') {
       const gain = this.addEnergy(15);
-      this.pushToast('Ad reward! Energy refilled ⚡', 'reward', { icon: '🎬', energy: gain });
+      this.pushToast('Ad reward! Energy restored ⚡', 'reward', { icon: '🎬', energy: gain });
     } else {
       const gain = this.addEnergy(5);
       d.coins = Math.min(999999, d.coins + 10);
@@ -600,7 +600,7 @@ class GameStore {
     d.claimedCollection.push(tier);
     d.coins = Math.min(999999, d.coins + def.coins);
     const energy = this.addEnergy(def.energy);
-    this.pushToast(`Collection ${tier} reached! Collector reward 🏆`, 'reward', {
+    this.pushToast(`Collection ${tier} reached! 🏆`, 'reward', {
       icon: '📚',
       coins: def.coins,
       energy,
@@ -628,7 +628,7 @@ class GameStore {
     d.tutorialSeen = true;
     d.coins = Math.min(999999, d.coins + 30);
     const energy = this.addEnergy(10);
-    this.pushToast('Tutorial done! Welcome gift arrived 🎁', 'reward', { icon: '🎓', coins: 30, energy });
+    this.pushToast('Tutorial done! Welcome gift unlocked 🎁', 'reward', { icon: '🎓', coins: 30, energy });
     sfx.fanfare();
     this.commit();
   }

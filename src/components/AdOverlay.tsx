@@ -32,7 +32,7 @@ export default function AdOverlay({ kind, onDone }: { kind: AdKind; onDone: (ok:
         AD · MOCK
       </div>
       <div className="text-6xl">🎁</div>
-      <div className="text-2xl">Ad playing...</div>
+      <div className="text-2xl">Ad playing…</div>
       <div className="text-5xl tabular-nums text-amber-300">{Math.max(left, 0)}</div>
       <button
         onClick={() => {

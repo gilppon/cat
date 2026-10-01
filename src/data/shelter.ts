@@ -24,9 +24,9 @@ export const PET_NAMES = [
 ];
 
 export const ORDER_LINES: Record<ItemCategory, string[]> = {
-  food: ['My tummy is so hungry…', 'I want something tasty!', 'Rumble rumble… feed me please', 'I want a special treat today'],
-  toy: ['I am bored~ play with me!', 'Will you play with me?', 'I want a brand new toy', 'I want to run and play!'],
-  medicine: ['I feel sick…', 'I hurt my paw pad', 'Cough cough… I need medicine', 'I will be fine after treatment'],
+  food: ['My tummy is so hungry…', 'I want something tasty!', 'Rumble rumble… feed me, please!', 'I want a special treat today'],
+  toy: ["I'm bored~ play with me!", 'Will you play with me?', 'I want a brand new toy', 'I want to run and play!'],
+  medicine: ['I feel sick…', 'My paw pads hurt', 'Cough cough… I need medicine', "I'll be fine after treatment"],
 };
 
 /* ---------------- Shelter restore areas ---------------- */
@@ -54,7 +54,7 @@ export const SHELTER_AREAS: ShelterArea[] = [
     tasks: [
       { id: 'cat_clean', name: 'Sweep Dust & Cobwebs', emoji: '🧹', hearts: 10, coins: 0 },
       { id: 'cat_tower', name: 'Build a Wooden Cat Tower', emoji: '🐾', hearts: 12, coins: 80 },
-      { id: 'cat_window', name: 'Replace with a Sunny Window', emoji: '🌤️', hearts: 15, coins: 120 },
+      { id: 'cat_window', name: 'Swap in a Sunny Window', emoji: '🌤️', hearts: 15, coins: 120 },
     ],
     reward: { generators: ['food'], coins: 100 },
     rewardText: ['🧺 Food Pantry upgraded (better item odds)', '💰 Bonus coins +100'],
@@ -64,7 +64,7 @@ export const SHELTER_AREAS: ShelterArea[] = [
     name: 'Happy Dog Run',
     emoji: '🐶',
     image: 'images/areas/dogrun.webp',
-    description: 'Turn a rocky lot into a green play yard where dogs can run to their hearts content.',
+    description: 'Turn a rocky lot into a green play yard where dogs can run to their heart\'s content.',
     tasks: [
       { id: 'dog_grass', name: 'Lay Down Fresh Grass', emoji: '🌱', hearts: 15, coins: 120 },
       { id: 'dog_agility', name: 'Set Up Agility Gear', emoji: '🎾', hearts: 18, coins: 160 },
@@ -82,7 +82,7 @@ export const SHELTER_AREAS: ShelterArea[] = [
     tasks: [
       { id: 'clinic_table', name: 'Repair the Exam Table', emoji: '🔧', hearts: 20, coins: 200 },
       { id: 'clinic_cabinet', name: 'Tidy the Medicine Cabinet', emoji: '💊', hearts: 25, coins: 260 },
-      { id: 'clinic_gear', name: 'Bring In Test Gear', emoji: '🔬', hearts: 30, coins: 320 },
+      { id: 'clinic_gear', name: 'Bring in Test Gear', emoji: '🔬', hearts: 30, coins: 320 },
     ],
     reward: { unlockPet: 'persian_01', generators: ['medicine'], maxEnergy: 10 },
     rewardText: ['🐈 Persian cats move in', '🧰 First Aid Box upgraded', '⚡ Max energy +10'],
@@ -92,7 +92,7 @@ export const SHELTER_AREAS: ShelterArea[] = [
     name: 'Happy Adoption Lounge',
     emoji: '💝',
     image: 'images/areas/lounge.webp',
-    description: 'A special place where new families meet. Finish the lounge so everyone can smile!',
+    description: 'A special place where new families meet. Restore the lounge so everyone can smile!',
     tasks: [
       { id: 'lounge_sofa', name: 'Place a Cozy Sofa', emoji: '🛋️', hearts: 24, coins: 240 },
       { id: 'lounge_photos', name: 'Decorate the Memory Wall', emoji: '🖼️', hearts: 30, coins: 320 },

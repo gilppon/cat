@@ -5,10 +5,10 @@ import { CATEGORY_META, MergeManager } from '../managers/MergeManager';
 import { CoinIcon, cx } from './ui';
 
 const TIPS = [
-  'Drag two identical items together to upgrade one step!',
-  'Tap a generator below to spawn an item for ⚡1 energy.',
+  'Drag two identical items together to merge them!',
+  'Tap a generator below to make an item for ⚡1 energy.',
   'Tap an item icon on a request card to find it on the board.',
-  'Items with a ✅ badge can be delivered to a friend right away.',
+  'Items with a ✅ badge can be delivered right away.',
   'Gather hearts and coins to restore the shelter and welcome new friends.',
   'Energy refills by 1 automatically every 15 seconds.',
   'Tap an item to see its details and sell it.',
@@ -81,10 +81,10 @@ export default function ItemInfoBar() {
         <div className="truncate text-[11px] text-slate-500">
           {next ? (
             <>
-              Merge one more → {next.emoji} {next.name}
+              Merge 1 more → {next.emoji} {next.name}
             </>
           ) : (
-            '✨ Max level item!'
+            '✨ Max level!'
           )}
         </div>
       </div>
@@ -117,7 +117,7 @@ export default function ItemInfoBar() {
           'Sell?'
         ) : (
           <>
-            Sell <CoinIcon className="h-4 w-4" /> {price}
+            Sell <CoinIcon className="h-4 w-4" /> {price.toLocaleString('en-US')}
           </>
         )}
       </button>

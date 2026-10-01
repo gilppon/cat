@@ -4,10 +4,10 @@ import { gameStore, tutorialStep } from '../managers/GameStore';
 import { cx } from './ui';
 
 const STEPS = [
-  { emoji: '🧩', title: 'Merge', desc: 'Drag two 🥛Warm Milk items together to merge them!' },
-  { emoji: '🎁', title: 'Deliver', desc: 'Nabi\'s request is ready! Press the [Deliver] button.' },
-  { emoji: '🏡', title: 'Restore Shelter', desc: 'Finish 🌿Pull the Wild Weeds in the Restore Shelter screen! (bottom tab on mobile, right panel on desktop)' },
-  { emoji: '🎉', title: 'All done!', desc: 'You are a true shelter keeper now! Grab your gift.' },
+  { emoji: '🧩', title: 'Merge', desc: 'Drag two Warm Milk (🥛) items together to merge them!' },
+  { emoji: '🎁', title: 'Deliver', desc: "Nabi's request is ready! Tap the Deliver button." },
+  { emoji: '🏡', title: 'Restore Shelter', desc: 'Finish 🌿 Pull the Wild Weeds in the Restore Shelter menu (bottom tab on mobile, side panel on desktop).' },
+  { emoji: '🎉', title: 'All done!', desc: "You're a true shelter keeper now! Grab your gift." },
 ];
 
 /** Interactive 60-second tutorial for the first session. Does not block board play (only the card takes pointer events). */
@@ -58,7 +58,7 @@ export default function TutorialOverlay() {
               onClick={() => gameStore.finishTutorial()}
               className="flex-1 rounded-xl bg-amber-400 py-2 text-sm font-bold text-amber-950 active:scale-95"
             >
-              🎁 Claim gift (+30 coins)
+              🎁 Claim your gift (+30 coins)
             </button>
           )}
         </div>
