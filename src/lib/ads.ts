@@ -5,6 +5,8 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { sfx } from './sfx';
+
 declare global {
   interface Window {
     PokiSDK?: any;
@@ -142,13 +144,15 @@ export const Ads = {
     notifyGameplayStop();
   },
 
-  /** Rewarded ad. Returns true once the view is completed */
+/** Rewarded ad. Returns true once the view is completed */
   async rewardedBreak(): Promise<boolean> {
     if (provider === 'poki' && ready) {
       try {
-        return Boolean(await window.PokiSDK.rewardedBreak());
+        return Boolean(await window.PokiSDK.rewardedBreak({ onStart: () => sfx.setAdMuted(true) }));
       } catch {
         return false;
+      } finally {
+        sfx.setAdMuted(false);
       }
     }
     if (provider === 'crazy' && ready) {
@@ -159,19 +163,31 @@ export const Ads = {
           if (settled) return;
           settled = true;
           window.clearTimeout(timeout);
+          sfx.setAdMuted(false);
           resolve(ok);
         };
         try {
           window.CrazyGames?.SDK?.ad?.requestAd('rewarded', {
-            adStarted: () => {},
-            adFinished: () => finish(true),
-            adError: () => finish(false),
+            adStarted: () => sfx.setAdMuted(true),
+            adFinished: () => {
+              sfx.setAdMuted(false);
+              finish(true);
+            },
+            adError: () => {
+              sfx.setAdMuted(false);
+              finish(false);
+            },
           });
         } catch {
           finish(false);
         }
       });
     }
-    return mockAd('rewarded');
+    sfx.setAdMuted(true);
+    try {
+      return await mockAd('rewarded');
+    } finally {
+      sfx.setAdMuted(false);
+    }
   },
 };

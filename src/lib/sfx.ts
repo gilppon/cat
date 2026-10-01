@@ -2,7 +2,10 @@
 
 const MUTE_KEY = 'PETS_HARBOR_MUTED';
 let ctx: AudioContext | null = null;
+let master: GainNode | null = null;
 let muted = false;
+// Kept separate from `muted` so un-muting after an ad never un-mutes a player-muted game.
+let adMuted = false;
 
 try {
   muted = localStorage.getItem(MUTE_KEY) === '1';
@@ -10,8 +13,12 @@ try {
   muted = false;
 }
 
+function applyGain() {
+  if (master) master.gain.value = adMuted ? 0 : 1;
+}
+
 function audio(): AudioContext | null {
-  if (muted) return null;
+  if (muted || adMuted) return null;
   try {
     if (!ctx) {
       const Ctor =
@@ -19,6 +26,9 @@ function audio(): AudioContext | null {
         (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!Ctor) return null;
       ctx = new Ctor();
+      master = ctx.createGain();
+      master.gain.value = adMuted ? 0 : 1;
+      master.connect(ctx.destination);
     }
     if (ctx.state === 'suspended') void ctx.resume();
     return ctx;
@@ -36,7 +46,7 @@ function tone(
   slideTo?: number,
 ) {
   const c = audio();
-  if (!c) return;
+  if (!c || !master) return;
   const t0 = c.currentTime + delay;
   const osc = c.createOscillator();
   const gain = c.createGain();
@@ -47,7 +57,7 @@ function tone(
   gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(gain);
-  gain.connect(c.destination);
+  gain.connect(master);
   osc.start(t0);
   osc.stop(t0 + dur + 0.03);
 }
@@ -64,6 +74,11 @@ export const sfx = {
     } catch {
       /* ignore */
     }
+  },
+  /** Portal requirement: silence all audio while an ad is playing. */
+  setAdMuted(value: boolean) {
+    adMuted = value;
+    applyGain();
   },
   tap: () => tone(620, 0, 0.06, 'triangle', 0.05),
   pick: () => tone(480, 0, 0.08, 'triangle', 0.06, 660),
