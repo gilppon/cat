@@ -4,7 +4,7 @@ import { COLLECTION_TIERS, DAILY_REWARDS, gameStore, overallProgress } from '../
 import type { ToastTone } from '../managers/GameStore';
 import { CATEGORIES, CATEGORY_META, ITEM_DATABASE, MergeManager } from '../managers/MergeManager';
 import { PET_SPECIES, SHELTER_AREAS } from '../data/shelter';
-import { sfx } from '../lib/sfx';
+import { sfx, startMusic } from '../lib/sfx';
 import { BoltIcon, CoinIcon, HeartIcon, Modal, cx } from './ui';
 import { asset } from '../lib/assets';
 
@@ -314,7 +314,11 @@ export function SettingsModal({ onClose, onHelp }: { onClose: () => void; onHelp
     const next = !muted;
     sfx.setMuted(next);
     setMuted(next);
-    if (!next) sfx.tap();
+    if (!next) {
+      // Unmuting is a gesture: (re)start the loop if it never got going.
+      startMusic();
+      sfx.tap();
+    }
   };
 
   const stats = [

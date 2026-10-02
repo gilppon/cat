@@ -17,6 +17,79 @@ function applyGain() {
   if (master) master.gain.value = adMuted ? 0 : 1;
 }
 
+// ---- Background music: warm F-major lullaby loop, no assets ----
+let musicGain: GainNode | null = null;
+let musicTimer: number | null = null;
+let musicStep = 0;
+
+function mnote(freq: number, delay: number, dur: number, type: OscillatorType, vol: number) {
+  const c = audio();
+  if (!c || !musicGain) return;
+  const t0 = c.currentTime + delay;
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain);
+  gain.connect(musicGain);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.05);
+}
+
+/** Idempotent. Call from a user gesture; AudioContext requires one. */
+export function startMusic() {
+  const c = audio();
+  if (!c) return;
+  if (!musicGain) {
+    musicGain = c.createGain();
+    musicGain.gain.value = 0.55;
+    musicGain.connect(master!);
+  }
+  if (musicTimer !== null) return;
+  musicStep = 0;
+  musicTimer = window.setInterval(musicTick, 210);
+}
+
+export function stopMusic() {
+  if (musicTimer !== null) {
+    window.clearInterval(musicTimer);
+    musicTimer = null;
+  }
+}
+
+function musicTick() {
+  // Never schedule while muted, ad-muted, hidden, or suspended; tails fade.
+  if (muted || adMuted || document.hidden) return;
+  const c = audio();
+  if (!c || c.state !== 'running') return;
+  const s = musicStep++ % 32;
+  // Pad chords: F - Bb - C - F, one per 8 steps, sine, long and soft.
+  if (s % 8 === 0) {
+    const chords = [
+      [174.61, 220.0, 261.63],
+      [174.61, 233.08, 293.66],
+      [196.0, 261.63, 329.63],
+      [174.61, 220.0, 261.63],
+    ];
+    chords[(s >> 3) % 4]?.forEach((f) => mnote(f, 0, 1.7, 'sine', 0.05));
+  }
+  // Sparse music-box melody on the off-bars, F major pentatonic.
+  if (s % 8 === 4) {
+    const lead = [523.25, 587.33, 659.25, 783.99, 880.0, 783.99, 659.25, 587.33];
+    const f = lead[(s >> 3) % 8];
+    if (f !== undefined) mnote(f, 0, 0.5, 'triangle', 0.05);
+  }
+  // Gentle root pulse under each chord change.
+  if (s % 8 === 0) {
+    const roots = [87.31, 87.31, 98.0, 87.31];
+    const r = roots[(s >> 3) % 4];
+    if (r !== undefined) mnote(r, 0, 0.4, 'sine', 0.07);
+  }
+}
+
 function audio(): AudioContext | null {
   if (muted || adMuted) return null;
   try {

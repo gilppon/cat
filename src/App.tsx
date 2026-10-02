@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useGame } from './hooks/useGame';
 import { canAffordAnyTask, gameStore } from './managers/GameStore';
-import { sfx } from './lib/sfx';
+import { sfx, startMusic } from './lib/sfx';
 import TitleScreen from './components/TitleScreen';
 import TopBar from './components/TopBar';
 import OrdersPanel from './components/OrdersPanel';
@@ -111,6 +111,8 @@ export default function App() {
     sfx.unlock();
     setStarted(true);
     Ads.gameplayStart();
+    // Music needs the same first gesture as the AudioContext itself.
+    startMusic();
     // The first playthrough is guided by the interactive tutorial, so skip auto-opening HelpModal
     if (gameStore.live.tutorialSeen) return;
     setHelpOpen(false);
