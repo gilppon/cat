@@ -4,6 +4,8 @@ import { SaveManager } from '../managers/SaveManager';
 import { gameStore } from '../managers/GameStore';
 import { PET_ORDER, PET_SPECIES } from '../data/shelter';
 import { asset } from '../lib/assets';
+import { getRestoreInvite } from '../lib/share';
+import { SHELTER_AREAS } from '../data/shelter';
 
 const FEATURES = [
   { icon: '🧩', text: 'Merge matching\nitems' },
@@ -14,6 +16,7 @@ const FEATURES = [
 export default function TitleScreen({ onStart }: { onStart: () => void }) {
   const [hasSave, setHasSave] = useState(() => SaveManager.hasSave());
   const [confirmReset, setConfirmReset] = useState(false);
+  const inviteArea = SHELTER_AREAS.find((area) => area.id === getRestoreInvite());
   const paws = useMemo(
     () =>
       Array.from({ length: 14 }, (_, i) => ({
@@ -61,6 +64,11 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-slate-600">
             Rebuild an abandoned seaside shelter and give hurt little friends a warm home.
           </p>
+          {inviteArea && (
+            <div className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-sm text-rose-800 ring-1 ring-rose-100">
+              A friend restored {inviteArea.name}. Can you help welcome the next animal? 🐾
+            </div>
+          )}
 
           <div className="mt-4 flex justify-center -space-x-2">
             {PET_ORDER.map((id, i) => {

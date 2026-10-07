@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGame } from '../hooks/useGame';
 import { COLLECTION_TIERS, DAILY_REWARDS, gameStore, overallProgress } from '../managers/GameStore';
 import type { ToastTone } from '../managers/GameStore';
@@ -7,6 +7,7 @@ import { PET_SPECIES, SHELTER_AREAS } from '../data/shelter';
 import { sfx, startMusic } from '../lib/sfx';
 import { BoltIcon, CoinIcon, HeartIcon, Modal, cx } from './ui';
 import { asset } from '../lib/assets';
+import { makeRestoreShareUrl } from '../lib/share';
 
 /* ---------------- Toasts ---------------- */
 const TONE: Record<ToastTone, string> = {
@@ -92,6 +93,21 @@ function Confetti() {
 export function CelebrationModal() {
   const snap = useGame();
   const area = SHELTER_AREAS.find((a) => a.id === snap.celebration);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareMessage, setShareMessage] = useState('');
+  useEffect(() => {
+    let active = true;
+    setShareUrl('');
+    setShareMessage('');
+    if (snap.celebration) {
+      void makeRestoreShareUrl(snap.celebration).then((url) => {
+        if (active) setShareUrl(url);
+      });
+    }
+    return () => {
+      active = false;
+    };
+  }, [snap.celebration]);
   if (!area) return null;
   const pet = area.reward.unlockPet ? (PET_SPECIES[area.reward.unlockPet] ?? null) : null;
   const lastArea = SHELTER_AREAS[SHELTER_AREAS.length - 1];
@@ -141,6 +157,34 @@ export function CelebrationModal() {
             ))}
             <li className="rounded-xl bg-emerald-50 px-3 py-2">⚡ Bonus: energy refilled to full!</li>
           </ul>
+          <button
+            onClick={async () => {
+              const text = pet
+                ? `I restored ${area.name} and welcomed a ${pet.label} to Pets Harbor! Come help another animal.`
+                : `I restored ${area.name} in Pets Harbor! Come help another animal.`;
+              try {
+                if (navigator.share) {
+                  await navigator.share({ title: 'Pets Harbor', text, url: shareUrl || window.location.href });
+                  setShareMessage('Invite shared! 🐾');
+                  return;
+                }
+                await navigator.clipboard.writeText(`${text} ${shareUrl || window.location.href}`);
+                setShareMessage('Invite link copied! Send it to a friend 🐾');
+              } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError') return;
+                try {
+                  await navigator.clipboard.writeText(`${text} ${shareUrl || window.location.href}`);
+                  setShareMessage('Invite link copied! Send it to a friend 🐾');
+                } catch {
+                  setShareMessage('Copy the game link from your browser to invite a friend.');
+                }
+              }
+            }}
+            className="mt-3 w-full rounded-full bg-rose-50 py-2.5 text-sm text-rose-700 ring-1 ring-rose-200 transition active:scale-[0.98]"
+          >
+            🐾 Invite a friend to help
+          </button>
+          {shareMessage && <p aria-live="polite" className="mt-2 text-xs text-emerald-700">{shareMessage}</p>}
           <button
             onClick={() => gameStore.closeCelebration()}
             className="anim-pulse-cta mt-5 w-full rounded-full bg-linear-to-b from-amber-400 to-orange-500 py-3 text-lg text-white shadow-lg transition active:scale-[0.98]"

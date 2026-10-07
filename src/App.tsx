@@ -66,7 +66,8 @@ export default function App() {
   const snap = useGame();
   const badge = canAffordAnyTask(snap.data);
   const daily = gameStore.dailyStatus();
-  const showDaily = started && !dailyDismissed && daily.available;
+  // Keep the first board clear until the player finishes or skips the core tutorial.
+  const showDaily = started && snap.data.tutorialSeen && !dailyDismissed && daily.available;
 
   // Ad SDK init + mock-ad UI registration
   useEffect(() => {

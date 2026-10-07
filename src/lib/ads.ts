@@ -24,6 +24,7 @@ let adUI: AdUI | null = null;
 let provider: 'poki' | 'crazy' | null = null;
 let ready = false;
 let initPromise: Promise<void> | null = null;
+let loadingFinishedSent = false;
 let gameplayActive = false;
 let gameplayNotified = false;
 
@@ -101,11 +102,11 @@ export const Ads = {
       const e = env();
       try {
         if (e === 'poki') {
-          await loadScript(POKI_URL);
+          if (!window.PokiSDK) await loadScript(POKI_URL);
           await window.PokiSDK?.init();
           provider = 'poki';
         } else if (e === 'crazy') {
-          await loadScript(CRAZY_URL);
+          if (!window.CrazyGames?.SDK) await loadScript(CRAZY_URL);
           await window.CrazyGames?.SDK?.init();
           try {
             window.CrazyGames?.SDK?.game?.loadingStart();
@@ -125,13 +126,14 @@ export const Ads = {
   },
 
   loadingFinished() {
-    if (!ready) return;
+    if (!ready || loadingFinishedSent) return;
     try {
       if (provider === 'poki') window.PokiSDK?.gameLoadingFinished?.();
       else if (provider === 'crazy') window.CrazyGames?.SDK?.game?.loadingStop();
     } catch {
       /* ignore */
     }
+    loadingFinishedSent = true;
   },
 
   gameplayStart() {
@@ -183,6 +185,8 @@ export const Ads = {
         }
       });
     }
+    // A portal without a working SDK must not receive a simulated reward.
+    if (env() !== null) return false;
     sfx.setAdMuted(true);
     try {
       return await mockAd('rewarded');
