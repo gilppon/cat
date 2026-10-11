@@ -452,9 +452,10 @@ export class MainScene extends Phaser.Scene {
         targets: a.container,
         x: c.x,
         y: c.y,
-        scale: 0.5,
+        scale: 0.3,
+        angle: -20,
         alpha: 0,
-        duration: 150,
+        duration: 140,
         ease: 'Quad.easeIn',
         onComplete: () => a.destroy(),
       });
@@ -463,49 +464,100 @@ export class MainScene extends Phaser.Scene {
       this.tweens.killTweensOf(b.container);
       this.tweens.add({
         targets: b.container,
-        scale: 0.5,
+        scale: 0.3,
+        angle: 20,
         alpha: 0,
-        duration: 150,
+        duration: 140,
         ease: 'Quad.easeIn',
         onComplete: () => b.destroy(),
       });
     }
 
     const nv = new ItemView(this, c.x, c.y, item);
-    nv.container.setScale(0.1).setDepth(40);
+    nv.container.setScale(0.2, 0.2).setDepth(45);
     this.put(to, nv);
+
+    // Juicy Squash & Stretch animation
     this.tweens.add({
       targets: nv.container,
-      scale: 1,
-      duration: 430,
-      delay: 110,
-      ease: 'Back.easeOut',
-      onComplete: () => nv.container.setDepth(10),
+      scaleX: 1.42,
+      scaleY: 0.58,
+      duration: 140,
+      delay: 90,
+      ease: 'Back.easeIn',
+      onComplete: () => {
+        this.tweens.add({
+          targets: nv.container,
+          scaleX: 0.88,
+          scaleY: 1.28,
+          duration: 170,
+          ease: 'Sine.easeOut',
+          onComplete: () => {
+            this.tweens.add({
+              targets: nv.container,
+              scaleX: 1,
+              scaleY: 1,
+              duration: 220,
+              ease: 'Bounce.easeOut',
+              onComplete: () => nv.container.setDepth(10),
+            });
+          },
+        });
+      },
     });
 
-    this.time.delayedCall(110, () => {
+    // Particle bursts & Shockwave rings
+    this.time.delayedCall(100, () => {
       if (!this.alive) return;
-      this.starFx.explode(14 + item.level * 3, c.x, c.y);
-      const ring = this.add.image(c.x, c.y, 'fx_ring').setDepth(85).setScale(0.35).setTint(hexToInt(meta.mid));
+      this.starFx.explode(18 + item.level * 4, c.x, c.y);
+      this.heartFx.explode(6 + item.level * 2, c.x, c.y);
+      if (item.level >= 4) this.coinFx.explode(4 + item.level * 2, c.x, c.y);
+
+      // Primary ring
+      const ring = this.add.image(c.x, c.y, 'fx_ring').setDepth(85).setScale(0.3).setTint(hexToInt(meta.mid));
       this.tweens.add({
         targets: ring,
-        scale: 1.3,
+        scale: 1.4,
         alpha: 0,
-        duration: 460,
+        duration: 440,
         ease: 'Cubic.easeOut',
         onComplete: () => ring.destroy(),
       });
+
+      // Secondary golden halo for level 3+
+      if (item.level >= 3) {
+        this.time.delayedCall(60, () => {
+          if (!this.alive) return;
+          const goldRing = this.add.image(c.x, c.y, 'fx_ring').setDepth(86).setScale(0.2).setTint(0xffd700);
+          this.tweens.add({
+            targets: goldRing,
+            scale: 1.8,
+            alpha: 0,
+            duration: 520,
+            ease: 'Sine.easeOut',
+            onComplete: () => goldRing.destroy(),
+          });
+        });
+      }
     });
 
+    // Dynamic celebration floating text & camera punch
     if (item.level === item.maxLevel) {
-      this.floatText(c.x, c.y - 58, 'MAX!', '#FFD34D', '#9A5B00');
-      this.cameras.main.shake(180, 0.005);
+      this.floatText(c.x, c.y - 65, '👑 MAX LEVEL! 👑', '#FFEAA7', '#D35400');
+      this.cameras.main.shake(220, 0.007);
     } else if (isNew) {
-      this.floatText(c.x, c.y - 58, 'NEW!', '#FF5FA2', '#FFFFFF');
+      this.floatText(c.x, c.y - 62, '✨ NEW! ✨', '#FF7675', '#FFFFFF');
+      this.cameras.main.shake(120, 0.0035);
+    } else if (item.level >= 5) {
+      this.floatText(c.x, c.y - 60, 'AWESOME! ⭐', '#FDCB6E', '#E67E22');
+      this.cameras.main.shake(140, 0.004);
+    } else if (item.level >= 3) {
+      this.floatText(c.x, c.y - 58, 'SWEET! 🐾', '#55E6C1', '#10AC84');
+      this.cameras.main.shake(80, 0.002);
     } else {
-      this.floatText(c.x, c.y - 58, `Lv.${item.level}`, '#FFFFFF', meta.dark);
+      this.floatText(c.x, c.y - 56, `Lv.${item.level} MERGE!`, '#FFFFFF', meta.dark);
     }
-    if (item.level >= 5 && item.level < item.maxLevel) this.cameras.main.shake(120, 0.0032);
+
     sfx.merge(item.level);
   }
 
@@ -765,21 +817,44 @@ export class MainScene extends Phaser.Scene {
     const t = this.add
       .text(x, y, text, {
         fontFamily: FONT_UI,
-        fontSize: '40px',
+        fontSize: '44px',
         color,
         stroke,
-        strokeThickness: 9,
+        strokeThickness: 10,
+        shadow: {
+          offsetX: 0,
+          offsetY: 4,
+          color: 'rgba(0,0,0,0.35)',
+          blur: 8,
+          stroke: true,
+          fill: true,
+        },
       })
       .setOrigin(0.5)
       .setDepth(95)
-      .setScale(0.5);
-    this.tweens.add({ targets: t, scale: 1, duration: 220, ease: 'Back.easeOut' });
+      .setScale(0.3);
+
     this.tweens.add({
       targets: t,
-      y: y - 64,
+      scale: 1.18,
+      duration: 190,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: t,
+          scale: 1,
+          duration: 110,
+          ease: 'Sine.easeOut',
+        });
+      },
+    });
+
+    this.tweens.add({
+      targets: t,
+      y: y - 70,
       alpha: 0,
-      delay: 260,
-      duration: 700,
+      delay: 320,
+      duration: 620,
       ease: 'Cubic.easeIn',
       onComplete: () => t.destroy(),
     });

@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { CATEGORIES, CATEGORY_META, ITEM_DATABASE } from '../managers/MergeManager';
-import { CELL, FONT_EMOJI, FONT_UI, GAME_H, GAME_W, GEN_H, GEN_W, ITEM_TEX } from '../game/constants';
+import { CELL, FONT_UI, GAME_H, GAME_W, GEN_H, GEN_W, ITEM_TEX } from '../game/constants';
+import { drawCrispItemArt, drawGeneratorArtwork } from './ItemArt';
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   const rr = Math.min(r, w / 2, h / 2);
@@ -118,17 +119,20 @@ export class BootScene extends Phaser.Scene {
       const m = CATEGORY_META[item.category];
       const S = ITEM_TEX;
       const isMax = item.level >= item.maxLevel;
+      const lvl = item.level;
+
       this.canvasTex(item.textureKey, S, S, (ctx) => {
-        const x = 10;
+        const x = 8;
         const y = 8;
-        const w = S - 20;
-        const h = S - 20;
-        const r = 30;
-        // body + drop shadow
+        const w = S - 16;
+        const h = S - 16;
+        const r = 28;
+
+        // 1. Soft Drop Shadow
         ctx.save();
-        ctx.shadowColor = 'rgba(90,55,20,0.32)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
+        ctx.shadowColor = 'rgba(70, 35, 10, 0.38)';
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetY = 6;
         roundRect(ctx, x, y, w, h, r);
         const g = ctx.createLinearGradient(0, y, 0, y + h);
         g.addColorStop(0, m.light);
@@ -136,42 +140,106 @@ export class BootScene extends Phaser.Scene {
         ctx.fillStyle = g;
         ctx.fill();
         ctx.restore();
-        // gloss
+
+        // 2. Sunburst aura for MAX level items
+        if (isMax) {
+          ctx.save();
+          roundRect(ctx, x, y, w, h, r);
+          ctx.clip();
+          ctx.translate(S / 2, S / 2);
+          ctx.fillStyle = 'rgba(255, 235, 59, 0.28)';
+          const rays = 12;
+          for (let i = 0; i < rays; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            const a1 = (Math.PI * 2 * i) / rays;
+            const a2 = a1 + (Math.PI / rays) * 0.5;
+            ctx.arc(0, 0, S, a1, a2);
+            ctx.closePath();
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // 3. Inner radial lighting for 3D depth
         ctx.save();
         roundRect(ctx, x, y, w, h, r);
         ctx.clip();
-        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        const radG = ctx.createRadialGradient(S / 2, y + h * 0.4, 10, S / 2, S / 2, w * 0.6);
+        radG.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        radG.addColorStop(0.7, 'rgba(255, 255, 255, 0)');
+        radG.addColorStop(1, 'rgba(0, 0, 0, 0.12)');
+        ctx.fillStyle = radG;
+        ctx.fillRect(x, y, w, h);
+
+        // Top Gloss Dome
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
         ctx.beginPath();
-        ctx.ellipse(S / 2, y + 6, w * 0.55, h * 0.27, 0, 0, Math.PI * 2);
+        ctx.ellipse(S / 2, y + 8, w * 0.48, h * 0.22, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = 'rgba(0,0,0,0.06)';
-        ctx.fillRect(x, y + h - 16, w, 16);
         ctx.restore();
-        // border
-        ctx.lineWidth = isMax ? 6 : 4;
-        ctx.strokeStyle = isMax ? '#FFC93C' : 'rgba(255,255,255,0.95)';
+
+        // 4. Polished 3D Bevel Border
+        ctx.lineWidth = isMax ? 6 : lvl >= 5 ? 5 : 4;
+        ctx.strokeStyle = isMax
+          ? '#FFD700'
+          : lvl >= 5
+            ? '#FF9F43'
+            : lvl >= 3
+              ? '#FFFFFF'
+              : 'rgba(255, 255, 255, 0.88)';
         roundRect(ctx, x + 2, y + 2, w - 4, h - 4, r - 2);
         ctx.stroke();
-        // emoji
-        ctx.font = `66px ${FONT_EMOJI}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(item.emoji, S / 2, y + h / 2 + 3);
-        // level badge
-        const bx = x + w - 14;
-        const by = y + h - 14;
+
+        // 5. Crisp Procedural Vector Art (Replaces emoji text!)
+        drawCrispItemArt(ctx, item.id, item.category, item.level, S / 2, y + h / 2 - 2, S * 0.72);
+
+        // 6. 3D Jelly Level Badge (Bottom Right)
+        const bx = x + w - 16;
+        const by = y + h - 16;
+        const br = 18;
+
+        // Badge shadow & body
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 3;
         ctx.beginPath();
-        ctx.arc(bx, by, 17, 0, Math.PI * 2);
-        ctx.fillStyle = isMax ? '#FFB400' : m.dark;
+        ctx.arc(bx, by, br, 0, Math.PI * 2);
+        const bgGrad = ctx.createLinearGradient(bx, by - br, bx, by + br);
+        if (isMax) {
+          bgGrad.addColorStop(0, '#FFF275');
+          bgGrad.addColorStop(1, '#F39C12');
+        } else if (lvl >= 5) {
+          bgGrad.addColorStop(0, '#FF7675');
+          bgGrad.addColorStop(1, '#D63031');
+        } else {
+          bgGrad.addColorStop(0, m.mid);
+          bgGrad.addColorStop(1, m.dark);
+        }
+        ctx.fillStyle = bgGrad;
         ctx.fill();
-        ctx.lineWidth = 4;
+        ctx.restore();
+
+        // Badge rim
+        ctx.lineWidth = 3.5;
         ctx.strokeStyle = '#FFFFFF';
         ctx.stroke();
+
+        // Badge level number
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 20px "Arial Rounded MT Bold", Arial, sans-serif';
+        ctx.font = 'bold 20px "Arial Rounded MT Bold", "Jua", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillText(String(item.level), bx, by + 1);
+
+        // Corner sparkle for High Level / MAX
         if (isMax) {
-          ctx.font = `26px ${FONT_EMOJI}`;
+          ctx.font = 'bold 24px "Jua", Arial';
+          ctx.fillStyle = '#FFD700';
+          ctx.fillText('👑', x + 20, y + 22);
+        } else if (lvl >= 5) {
+          ctx.fillStyle = '#FFFFFF';
           ctx.fillText('✨', x + 18, y + 18);
         }
       });
@@ -223,14 +291,12 @@ export class BootScene extends Phaser.Scene {
         ctx.stroke();
       });
       this.canvasTex(`gen_emoji_${cat}`, 130, 120, (ctx) => {
-        ctx.fillStyle = 'rgba(255,255,255,0.38)';
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
         ctx.beginPath();
-        ctx.ellipse(65, 62, 54, 50, 0, 0, Math.PI * 2);
+        ctx.ellipse(65, 62, 56, 52, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.font = `74px ${FONT_EMOJI}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(m.generatorEmoji, 65, 66);
+        // High-definition procedural generator illustration
+        drawGeneratorArtwork(ctx, cat, 65, 60, 92);
       });
     });
 

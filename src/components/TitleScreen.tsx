@@ -97,9 +97,9 @@ export default function TitleScreen({ onStart }: { onStart: () => void }) {
 
           <button
             onClick={onStart}
-            className="anim-pulse-cta mt-6 w-full rounded-full bg-linear-to-b from-orange-400 to-orange-500 py-3.5 text-xl text-white shadow-lg transition active:scale-[0.98]"
+            className="btn-jelly-cta anim-pulse-cta mt-6 w-full rounded-full py-4 text-2xl font-bold tracking-wide text-white shadow-xl"
           >
-            {hasSave ? '▶ Continue' : '▶ Play'}
+            {hasSave ? '▶ Continue' : '▶ Play Now'}
           </button>
           {hasSave && (
             <button
